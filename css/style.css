@@ -1,0 +1,26 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f8f8f8;
+}
+
+#gameContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 600;
+    height: 700;
+    overflow: hidden;
+}
+
+canvas {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+
