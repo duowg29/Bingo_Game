@@ -12,8 +12,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 1000;
-    height: 800;
+    width: 800;
+    height: 900;
     overflow: hidden;
 }
 
