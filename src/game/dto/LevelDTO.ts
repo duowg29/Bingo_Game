@@ -2,14 +2,14 @@ export class LevelDTO {
     key: string;
     rangeMin: number;
     rangeMax: number;
-    operators: string;
+    operators: string[];
     duration: number;
 
     constructor(
         key: string,
         rangeMin: number,
         rangeMax: number,
-        operators: string,
+        operators: string[],
         duration: number
     ) {
         this.key = key;
