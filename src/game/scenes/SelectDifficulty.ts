@@ -126,13 +126,7 @@ export default class SelectDifficulty extends Phaser.Scene {
             return;
         }
 
-        const level = new LevelDTO(
-            "level1",
-            1,
-            100,
-            [this.selectedOperator],
-            this.selectedDuration
-        );
+        const level = new LevelDTO("level1", 1, 100, this.selectedDuration);
 
         this.scene.start("GameScene", { level });
     }

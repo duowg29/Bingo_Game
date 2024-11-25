@@ -1,0 +1,24 @@
+{
+    "cards": [
+        {
+            "key": "card1",
+            "number": 8,
+            "marked": false
+        },
+        {
+            "key": "card2",
+            "number": 15,
+            "marked": false
+        },
+        {
+            "key": "card3",
+            "number": 42,
+            "marked": false
+        },
+        {
+            "key": "card4",
+            "number": 4,
+            "marked": false
+        }
+    ]
+}
