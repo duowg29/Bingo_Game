@@ -1,0 +1,40 @@
+{
+    "textures": [
+        {
+            "image": "BingoBoard",
+            "format": "RGBA8888",
+            "size": {
+                "w": 1342,
+                "h": 1307
+            },
+            "scale": 1,
+            "frames": [
+                {
+                    "filename": "Config 2022 Bingo Card.png",
+                    "rotated": false,
+                    "trimmed": false,
+                    "sourceSize": {
+                        "w": 1342,
+                        "h": 1307
+                    },
+                    "spriteSourceSize": {
+                        "x": 0,
+                        "y": 0,
+                        "w": 1342,
+                        "h": 1307
+                    },
+                    "frame": {
+                        "x": 0,
+                        "y": 0,
+                        "w": 1342,
+                        "h": 1307
+                    }
+                }
+            ]
+        }
+    ],
+    "meta": {
+        "app": "http://free-tex-packer.com",
+        "version": "0.6.7"
+    }
+}

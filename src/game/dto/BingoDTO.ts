@@ -2,12 +2,12 @@ export class BingoDTO {
     key: string;
     cols: number;
     rows: number;
-    resultList: number[];
+    operator: string[];
 
-    constructor(key: string, cols: number, rows: number, resultList: number[]) {
+    constructor(key: string, cols: number, rows: number, operator: string[]) {
         this.key = key;
         this.cols = cols;
         this.rows = rows;
-        this.resultList = resultList;
+        this.operator = operator;
     }
 }

@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 import { ButtonDTO } from "../dto/ButtonDTO";
 import Button from "../utilities/Button";
-import { LevelDTO } from "../dto/LevelDTO";
 import { textStyle1 } from "../utilities/TextStyle";
+import { DurationData } from "../data/DurationData";
 
 export default class SelectDifficulty extends Phaser.Scene {
     private selectedOperator: string | null = null;
@@ -46,22 +46,6 @@ export default class SelectDifficulty extends Phaser.Scene {
             );
             this.operatorBoxes.push(box);
         });
-        const difficulties = [
-            { label: "Medium", duration: 30 },
-            { label: "Fast", duration: 20 },
-            { label: "Faster", duration: 15 },
-            { label: "Fastest", duration: 10 },
-        ];
-
-        difficulties.forEach((difficulty, index) => {
-            const box = this.createCheckBox(
-                100,
-                300 + index * 30,
-                difficulty.label,
-                () => this.selectDuration(difficulty.duration, index)
-            );
-            this.durationBoxes.push(box);
-        });
 
         this.add
             .text(100, 450, "How Fast?", {
@@ -69,6 +53,16 @@ export default class SelectDifficulty extends Phaser.Scene {
                 color: "#FFFFFF",
             })
             .setOrigin(0);
+
+        DurationData.forEach((difficulty, index) => {
+            const box = this.createCheckBox(
+                100,
+                300 + index * 30,
+                difficulty.key,
+                () => this.selectDuration(difficulty.duration, index)
+            );
+            this.durationBoxes.push(box);
+        });
 
         const startButtonDTO = new ButtonDTO(
             "startButton",
@@ -125,9 +119,9 @@ export default class SelectDifficulty extends Phaser.Scene {
             alert("Please select one operator and one difficulty level.");
             return;
         }
-
-        const level = new LevelDTO("level1", 1, 100, this.selectedDuration);
-
-        this.scene.start("GameScene", { level });
+        this.scene.start("GameScene", {
+            operator: this.selectedOperator,
+            duration: this.selectedDuration,
+        });
     }
 }
