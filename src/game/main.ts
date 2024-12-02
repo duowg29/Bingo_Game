@@ -14,10 +14,6 @@ const config: Phaser.Types.Core.GameConfig = {
     parent: "game-container",
     backgroundColor: "#028af8",
     scene: [Boot, MenuScene, SelectDifficulty, GameScene],
-    scale: {
-        mode: Phaser.Scale.FIT, // Canvas sẽ vừa vặn với kích thước cửa sổ mà không bị tràn
-        autoCenter: Phaser.Scale.CENTER_BOTH, // Căn giữa game trong cửa sổ
-    },
 };
 
 const StartGame = (parent: string) => {

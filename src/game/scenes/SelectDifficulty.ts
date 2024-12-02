@@ -3,6 +3,7 @@ import { ButtonDTO } from "../dto/ButtonDTO";
 import Button from "../utilities/Button";
 import { textStyle1 } from "../utilities/TextStyle";
 import { DurationData } from "../data/DurationData";
+import BackgroundLoader from "../utilities/BackgroundLoader";
 
 export default class SelectDifficulty extends Phaser.Scene {
     private selectedOperator: string | null = null;
@@ -13,9 +14,18 @@ export default class SelectDifficulty extends Phaser.Scene {
     constructor() {
         super({ key: "SelectDifficulty" });
     }
-    preload(): void {}
+    preload(): void {
+        this.load.image("bgMenuScene", "assets/images/bgMenuScene.png");
+    }
 
     create(): void {
+        const backgroundLoader = new BackgroundLoader(
+            this,
+            "bgMenuScene",
+            this.cameras.main.centerX,
+            this.cameras.main.centerY
+        );
+        backgroundLoader.loadBackground();
         this.add
             .text(
                 this.cameras.main.centerX,
@@ -69,8 +79,10 @@ export default class SelectDifficulty extends Phaser.Scene {
             "Start",
             400,
             400,
-            this.startGame.bind(this)
+            this.startGame.bind(this),
+            "Button2"
         );
+
         new Button(this, startButtonDTO);
     }
 

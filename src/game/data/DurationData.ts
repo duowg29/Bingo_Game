@@ -1,18 +1,18 @@
 export const DurationData = [
     {
-        key: "easy",
+        key: "Easy",
         duration: 20,
     },
     {
-        key: "medium",
+        key: "Medium",
         duration: 15,
     },
     {
-        key: "hard",
+        key: "Hard",
         duration: 10,
     },
     {
-        key: "extreme",
+        key: "Extreme",
         duration: 5,
     },
 ];
