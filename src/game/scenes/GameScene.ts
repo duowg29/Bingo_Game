@@ -3,11 +3,15 @@ import { BingoDTO } from "../dto/BingoDTO";
 import { CardDTO } from "../dto/CardDTO";
 import { BingoData } from "../data/BingoData";
 import { CardData } from "../data/CardData";
+import { CalculationDTO } from "../dto/CalculationDTO";
+import { CalculationData } from "../data/CalculationData";
 
 export default class GameScene extends Phaser.Scene {
     private bingo: BingoDTO;
     private cardData: CardDTO[] = [];
-    private bingoBoard: Phaser.GameObjects.Image;
+    private currentCalculation: CalculationDTO;
+    private calculationText: Phaser.GameObjects.Text;
+    private usedIndexes: Set<number> = new Set();
 
     constructor() {
         super({ key: "GameScene" });
@@ -19,7 +23,7 @@ export default class GameScene extends Phaser.Scene {
             bingoConfig.id,
             bingoConfig.cols,
             bingoConfig.rows,
-            [bingoConfig.operator]
+            [data.operator]
         );
 
         console.log("GameScene Init Data:", {
@@ -28,78 +32,156 @@ export default class GameScene extends Phaser.Scene {
             rows: this.bingo.rows,
             operator: this.bingo.operator,
         });
+
+        this.updateCalculation(data.operator);
     }
 
     preload(): void {
         this.load.atlas(
-            "BingoBoard",
-            "assets/BingoBoard.png",
-            "assets/BingoBoard.json"
+            "BingoCard",
+            "assets/BingoCard.png",
+            "assets/BingoCard.json"
         );
     }
 
     create(): void {
-        this.bingoBoard = this.add.image(
-            this.cameras.main.centerX,
-            this.cameras.main.centerY,
-            "BingoBoard"
+        const selectedOperator = this.bingo.operator[0];
+        const filteredData = CalculationData.filter((calc) =>
+            calc.operator.includes(selectedOperator)
         );
-        this.bingoBoard.setOrigin(0.5, 0.5).setDisplaySize(500, 500);
 
-        this.cardData = CardData.map((card, index) => {
-            const cardKey = card.key;
-            const cardWidth = card.width;
-            const cardHeight = card.height;
-            const marked = card.marked;
-
+        this.cardData = filteredData.slice(0, 25).map((calc, index) => {
+            const cardInfo = CardData[index];
             return new CardDTO(
-                cardKey,
-                index + 1,
-                cardWidth,
-                cardHeight,
-                marked
+                `card${index + 1}`,
+                calc.result,
+                cardInfo.width,
+                cardInfo.height,
+                false
             );
         });
 
+        this.drawCalculation();
         this.drawCards();
     }
 
+    drawCalculation(): void {
+        const calcText = this.getCalculationText(this.currentCalculation);
+        this.calculationText = this.add
+            .text(this.cameras.main.centerX, 150, calcText, {
+                fontSize: "24px",
+                color: "#000",
+                fontStyle: "bold",
+            })
+            .setOrigin(0.5, 0.5);
+    }
+
+    getCalculationText(calculation: CalculationDTO): string {
+        const operatorSymbol = this.convertOperatorToSymbol(
+            calculation.operator[0]
+        );
+        return `${calculation.valueA} ${operatorSymbol} ${calculation.valueB} = ?`;
+    }
+
+    convertOperatorToSymbol(operator: string): string {
+        switch (operator) {
+            case "Addition":
+                return "+";
+            case "Subtraction":
+                return "-";
+            case "Multiplication":
+                return "*";
+            case "Division":
+                return "/";
+            default:
+                return "";
+        }
+    }
+
     drawCards(): void {
-        const offsetX = 20;
-        const offsetY = 20;
-        const cardWidth = 100;
-        const cardHeight = 100;
+        const { cols, rows } = this.bingo;
+        const offsetX = 10;
+        const offsetY = 10;
 
         let cardIndex = 0;
-        for (let row = 0; row < this.bingo.rows; row++) {
-            for (let col = 0; col < this.bingo.cols; col++) {
+
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                const card = this.cardData[cardIndex];
                 const x =
                     this.cameras.main.centerX -
-                    250 +
-                    col * (cardWidth + offsetX);
+                    (cols * card.width) / 2 +
+                    col * (card.width + offsetX);
                 const y =
                     this.cameras.main.centerY -
-                    250 +
-                    row * (cardHeight + offsetY);
-
-                const card = this.cardData[cardIndex];
+                    (rows * card.height) / 2 +
+                    row * (card.height + offsetY) +
+                    100;
 
                 const cardImage = this.add
-                    .image(x, y, "BingoBoard")
+                    .image(x, y, "BingoCard")
                     .setFrame(0)
-                    .setDisplaySize(cardWidth, cardHeight)
-                    .setOrigin(0.5, 0.5);
-                const operatorText = this.add
-                    .text(x, y, `${this.bingo.operator[0]}`, {
-                        fontSize: "16px",
-                        color: "#000000",
-                        align: "center",
+                    .setDisplaySize(card.width, card.height)
+                    .setOrigin(0.5, 0.5)
+                    .setInteractive();
+
+                this.add
+                    .text(x, y, `${card.number}`, {
+                        fontSize: "20px",
+                        color: "#000",
+                        fontStyle: "bold",
                     })
                     .setOrigin(0.5, 0.5);
+
+                cardImage.on("pointerdown", () => {
+                    this.checkWin(card, cardImage);
+                });
 
                 cardIndex++;
             }
         }
+    }
+
+    checkWin(card: CardDTO, cardImage: Phaser.GameObjects.Image): void {
+        if (card.number === this.currentCalculation.result && !card.marked) {
+            card.marked = true;
+            cardImage.setTint(0x00ff00);
+
+            this.updateCalculation(this.bingo.operator[0]);
+
+            this.calculationText.setText(
+                this.getCalculationText(this.currentCalculation)
+            );
+        }
+    }
+
+    updateCalculation(operator: string): void {
+        const filteredData = CalculationData.filter((calc) =>
+            calc.operator.includes(operator)
+        );
+
+        const unusedCalculations = filteredData.filter(
+            (_, index) => !this.usedIndexes.has(index)
+        );
+
+        if (unusedCalculations.length === 0) {
+            this.usedIndexes.clear();
+        }
+
+        const randomCalculation =
+            unusedCalculations[
+                Math.floor(Math.random() * unusedCalculations.length)
+            ];
+
+        this.currentCalculation = new CalculationDTO(
+            randomCalculation.valueA,
+            randomCalculation.valueB,
+            randomCalculation.result,
+            [operator]
+        );
+
+        const usedIndex = filteredData.indexOf(randomCalculation);
+        this.usedIndexes.add(usedIndex);
     }
 
     update(): void {}

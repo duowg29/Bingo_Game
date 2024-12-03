@@ -1,0 +1,40 @@
+{
+	"textures": [
+		{
+			"image": "BingoCard",
+			"format": "RGBA8888",
+			"size": {
+				"w": 200,
+				"h": 191
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "BingoCard.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 191
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 191
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 191
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "http://free-tex-packer.com",
+		"version": "0.6.7"
+	}
+}

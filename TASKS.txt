@@ -1,0 +1,7 @@
+Thiết kế lại giao diện
+Vẽ lại ERD
+viết hàm checkwin (theo cột hoặc hàng)
+Vẽ container cho calculation
+Nếu chọn sai thì ẩn thẻ
+Cập nhập lại nhiệm vụ trên report
+Làm duration
