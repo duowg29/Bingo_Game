@@ -199,7 +199,7 @@ export default class GameScene extends Phaser.Scene {
             cardImage.setTint(0x00ff00);
 
             if (this.checkWin()) {
-                this.handleWin();
+                this.scene.start("EndScene");
             } else {
                 this.updateCalculation(this.bingo.operator[0]);
                 this.calculationText.setText(
@@ -207,13 +207,6 @@ export default class GameScene extends Phaser.Scene {
                 );
             }
         }
-    }
-
-    handleWin(): void {
-        alert("YOU WIN");
-        this.time.delayedCall(2000, () => {
-            this.scene.start("MenuScene");
-        });
     }
 
     updateCalculation(operator: string): void {

@@ -3,6 +3,8 @@ export class ButtonDTO {
     text: string;
     positionX: number;
     positionY: number;
+    width: number;
+    height: number;
     onClick: () => void;
     style?: "Button1" | "Button2";
 
@@ -11,6 +13,8 @@ export class ButtonDTO {
         text: string,
         positionX: number,
         positionY: number,
+        width: number,
+        height: number,
         onClick: () => void,
         style?: "Button1" | "Button2"
     ) {
@@ -18,6 +22,8 @@ export class ButtonDTO {
         this.text = text;
         this.positionX = positionX;
         this.positionY = positionY;
+        this.width = width;
+        this.height = height;
         this.onClick = onClick;
         this.style = style;
     }

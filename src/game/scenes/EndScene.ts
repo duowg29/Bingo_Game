@@ -4,14 +4,14 @@ import Button from "../utilities/Button";
 import BackgroundLoader from "../utilities/BackgroundLoader";
 import { textStyle1 } from "../utilities/TextStyle";
 
-export default class MenuScene extends Phaser.Scene {
+export default class EndScene extends Phaser.Scene {
     constructor() {
-        super({ key: "MenuScene" });
+        super({ key: "EndScene" });
     }
     preload(): void {
         this.load.atlas("Button", "assets/Button.png", "assets/Button.json");
         this.load.image("whiteBg", "assets/images/whiteBg.png");
-        this.load.image("BingoImage", "assets/images/BingoImage.png");
+        this.load.image("WinImage", "assets/images/WinImage.png");
     }
     create(): void {
         const backgroundLoader = new BackgroundLoader(
@@ -22,24 +22,27 @@ export default class MenuScene extends Phaser.Scene {
         );
         backgroundLoader.loadBackground();
         this.add
-            .image(this.cameras.main.centerX, 300, "BingoImage")
-            .setFrame(0)
-            .setDisplaySize(600, 500)
+            .image(
+                this.cameras.main.centerX,
+                this.cameras.main.centerY,
+                "WinImage"
+            )
+            .setDisplaySize(500, 400)
             .setOrigin(0.5, 0.5);
-
-        const startButton = new ButtonDTO(
-            "startButton",
-            "Start Game",
+        const returnButtonDTO = new ButtonDTO(
+            "returnButton",
+            "Return",
             this.cameras.main.centerX,
-            600,
+            this.cameras.main.centerY + 200,
             200,
             300,
             () => {
-                // this.scene.start("SelectDifficulty");
-                this.scene.start("EndScene");
+                this.scene.start("SelectDifficulty");
             },
-            "Button2"
+            "Button1"
         );
-        new Button(this, startButton);
+
+        new Button(this, returnButtonDTO);
     }
+    update(): void {}
 }

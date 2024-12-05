@@ -88,6 +88,8 @@ export default class SelectDifficulty extends Phaser.Scene {
             "Start",
             550,
             600,
+            200,
+            300,
             this.startGame.bind(this),
             "Button2"
         );

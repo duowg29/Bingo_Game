@@ -2,6 +2,7 @@ import Boot from "./scenes/Boot";
 import SelectDifficulty from "./scenes/SelectDifficulty";
 import MenuScene from "./scenes/MenuScene";
 import GameScene from "./scenes/GameScene";
+import EndScene from "./scenes/EndScene";
 
 import { AUTO, Game } from "phaser";
 
@@ -13,7 +14,7 @@ const config: Phaser.Types.Core.GameConfig = {
     height: 900,
     parent: "game-container",
     backgroundColor: "#028af8",
-    scene: [Boot, MenuScene, SelectDifficulty, GameScene],
+    scene: [Boot, MenuScene, SelectDifficulty, GameScene, EndScene],
 };
 
 const StartGame = (parent: string) => {
