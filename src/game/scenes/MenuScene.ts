@@ -9,30 +9,34 @@ export default class MenuScene extends Phaser.Scene {
         super({ key: "MenuScene" });
     }
     preload(): void {
-        this.load.image("bgMenuScene", "assets/images/bgMenuScene.png");
+        this.load.atlas("Button", "assets/Button.png", "assets/Button.json");
+        this.load.image("whiteBg", "assets/images/whiteBg.png");
+        this.load.image("BingoImage", "assets/images/BingoImage.png");
     }
     create(): void {
         const backgroundLoader = new BackgroundLoader(
             this,
-            "bgMenuScene",
+            "whiteBg",
             this.cameras.main.centerX,
             this.cameras.main.centerY
         );
         backgroundLoader.loadBackground();
-
         this.add
-            .text(this.cameras.main.centerX, 200, "Bingo", textStyle1)
-            .setOrigin(0.5);
+            .image(this.cameras.main.centerX, 300, "BingoImage")
+            .setFrame(0)
+            .setDisplaySize(600, 500)
+            .setOrigin(0.5, 0.5);
 
-        const startButtonDTO = new ButtonDTO(
+        const startButton = new ButtonDTO(
             "startButton",
             "Start Game",
             this.cameras.main.centerX,
-            500,
+            600,
             () => {
                 this.scene.start("SelectDifficulty");
-            }
+            },
+            "Button2"
         );
-        new Button(this, startButtonDTO);
+        new Button(this, startButton);
     }
 }

@@ -1,0 +1,40 @@
+{
+	"textures": [
+		{
+			"image": "Button",
+			"format": "RGBA8888",
+			"size": {
+				"w": 276,
+				"h": 124
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "Button.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 276,
+						"h": 124
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 276,
+						"h": 124
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 276,
+						"h": 124
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "http://free-tex-packer.com",
+		"version": "0.6.7"
+	}
+}

@@ -1,0 +1,40 @@
+{
+	"textures": [
+		{
+			"image": "CalculationCard",
+			"format": "RGBA8888",
+			"size": {
+				"w": 506,
+				"h": 206
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "Item var4.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 506,
+						"h": 206
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 506,
+						"h": 206
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 506,
+						"h": 206
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "http://free-tex-packer.com",
+		"version": "0.6.7"
+	}
+}

@@ -18,17 +18,17 @@ export const buttonStyle1: Phaser.Types.GameObjects.Text.TextStyle = {
 
 export const buttonStyle2: Phaser.Types.GameObjects.Text.TextStyle = {
     fontFamily: "Maven Pro",
-    fontSize: "32px",
-    color: "#fff",
+    fontSize: "60px",
+    color: "#000000",
     stroke: "#000000",
     strokeThickness: 2,
-    shadow: {
-        offsetX: 0,
-        offsetY: 0,
-        color: "#000000",
-        blur: 0,
-        fill: true,
-    },
+    // shadow: {
+    //     offsetX: 0,
+    //     offsetY: 0,
+    //     color: "#000000",
+    //     blur: 0,
+    //     fill: true,
+    // },
     padding: { x: 20, y: 10 },
 };
 
@@ -69,8 +69,8 @@ export default class Button {
         });
 
         buttonText.on("pointerout", () => {
-            buttonText.setStyle({ color: "#0f0" });
-            buttonText.setShadow();
+            buttonText.setStyle({ color: "#000000" });
+            // buttonText.setShadow();
         });
 
         return buttonText;

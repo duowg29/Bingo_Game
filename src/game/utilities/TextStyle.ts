@@ -1,7 +1,7 @@
 export const textStyle1: Phaser.Types.GameObjects.Text.TextStyle = {
     fontFamily: "Maven Pro",
-    fontSize: "64px",
-    color: "#ffffff",
+    fontSize: "58px",
+    color: "#000000",
     stroke: "#000000",
     strokeThickness: 6,
     shadow: {

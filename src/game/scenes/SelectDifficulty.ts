@@ -15,29 +15,38 @@ export default class SelectDifficulty extends Phaser.Scene {
         super({ key: "SelectDifficulty" });
     }
     preload(): void {
-        this.load.image("bgMenuScene", "assets/images/bgMenuScene.png");
+        this.load.image("whiteBg", "assets/images/whiteBg.png");
+        this.load.image("TeacherImage", "assets/images/TeacherImage.png");
     }
 
     create(): void {
         const backgroundLoader = new BackgroundLoader(
             this,
-            "bgMenuScene",
+            "whiteBg",
             this.cameras.main.centerX,
             this.cameras.main.centerY
         );
         backgroundLoader.loadBackground();
         this.add
             .text(
-                this.cameras.main.centerX,
+                this.cameras.main.centerX - 200,
                 this.cameras.main.centerY - 300,
                 "Select Difficulty",
-                textStyle1
+                {
+                    font: "60px Arial",
+                    color: "#000000",
+                }
             )
-            .setOrigin(0.5);
+            .setOrigin(0);
+        this.add
+            .image(500, 400, "TeacherImage")
+            .setDisplaySize(300, 300)
+            .setOrigin(0.5, 0.5);
+
         this.add
             .text(100, 260, "What kind?", {
-                font: "24px Arial",
-                color: "#FFFFFF",
+                font: "30px Arial",
+                color: "#000000",
             })
             .setOrigin(0);
 
@@ -59,8 +68,8 @@ export default class SelectDifficulty extends Phaser.Scene {
 
         this.add
             .text(100, 450, "How Fast?", {
-                font: "24px Arial",
-                color: "#FFFFFF",
+                font: "30px Arial",
+                color: "#000000",
             })
             .setOrigin(0);
 
@@ -77,8 +86,8 @@ export default class SelectDifficulty extends Phaser.Scene {
         const startButtonDTO = new ButtonDTO(
             "startButton",
             "Start",
-            400,
-            400,
+            550,
+            600,
             this.startGame.bind(this),
             "Button2"
         );
@@ -93,11 +102,11 @@ export default class SelectDifficulty extends Phaser.Scene {
         onClick: () => void
     ): Phaser.GameObjects.Rectangle {
         const box = this.add
-            .rectangle(x, y + 200, 20, 20, 0x000000)
+            .rectangle(x, y + 210, 20, 20, 0x000000)
             .setInteractive();
-        const text = this.add.text(x + 30, y - 10 + 200, label, {
-            font: "20px Arial",
-            color: "#FFFFFF",
+        const text = this.add.text(x + 30, y + 195, label, {
+            font: "30px Arial",
+            color: "#000000",
         });
 
         box.on("pointerdown", () => {
