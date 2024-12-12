@@ -4,6 +4,7 @@ export class CardDTO {
     width: number;
     height: number;
     marked: boolean;
+    text?: Phaser.GameObjects.Text;
 
     constructor(
         key: string,

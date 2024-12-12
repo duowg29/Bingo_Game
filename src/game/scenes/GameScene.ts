@@ -6,6 +6,8 @@ import { CardData } from "../data/CardData";
 import { CalculationDTO } from "../dto/CalculationDTO";
 import { CalculationData } from "../data/CalculationData";
 import BackgroundLoader from "../utilities/BackgroundLoader";
+import TimerManager from "../utilities/TimerManager";
+import MenuScene from "./MenuScene";
 
 export default class GameScene extends Phaser.Scene {
     private bingo: BingoDTO;
@@ -13,6 +15,10 @@ export default class GameScene extends Phaser.Scene {
     private currentCalculation: CalculationDTO;
     private calculationText: Phaser.GameObjects.Text;
     private usedIndexes: Set<number> = new Set();
+    private duration: number;
+    private timerManager: TimerManager;
+    private timerText: Phaser.GameObjects.Text;
+    private removedIndexes: Set<number> = new Set(); // Lưu trữ các câu hỏi bị xóa
 
     constructor() {
         super({ key: "GameScene" });
@@ -27,12 +33,13 @@ export default class GameScene extends Phaser.Scene {
             [data.operator]
         );
 
-        console.log("GameScene Init Data:", {
-            key: this.bingo.key,
-            cols: this.bingo.cols,
-            rows: this.bingo.rows,
-            operator: this.bingo.operator,
-        });
+        this.duration = data.duration;
+
+        this.timerManager = new TimerManager(
+            this,
+            this.duration,
+            this.onTimeOut.bind(this)
+        );
 
         this.updateCalculation(data.operator);
     }
@@ -77,6 +84,24 @@ export default class GameScene extends Phaser.Scene {
 
         this.drawCalculation();
         this.drawCards();
+
+        this.timerText = this.add
+            .text(this.cameras.main.centerX, 50, `Time: ${this.duration}`, {
+                fontSize: "24px",
+                color: "#ff0000",
+            })
+            .setOrigin(0.5);
+
+        this.timerManager.start();
+    }
+    onTimeOut(): void {
+        // Hành động khi hết thời gian
+        console.log("Time is up!");
+        this.updateCalculation(this.bingo.operator[0]);
+        this.calculationText.setText(
+            this.getCalculationText(this.currentCalculation)
+        );
+        this.timerManager.reset(); // Khởi động lại bộ đếm cho câu hỏi mới
     }
 
     drawCalculation(): void {
@@ -145,7 +170,7 @@ export default class GameScene extends Phaser.Scene {
                     .setOrigin(0.5, 0.5)
                     .setInteractive();
 
-                this.add
+                const cardText = this.add
                     .text(x, y, `${card.number}`, {
                         fontSize: "20px",
                         color: "#000",
@@ -153,8 +178,10 @@ export default class GameScene extends Phaser.Scene {
                     })
                     .setOrigin(0.5, 0.5);
 
+                card["text"] = cardText;
+
                 cardImage.on("pointerdown", () => {
-                    this.checkCorrect(card, cardImage);
+                    this.checkCorrect(card, cardImage, cardText);
                 });
 
                 cardIndex++;
@@ -193,11 +220,17 @@ export default class GameScene extends Phaser.Scene {
         return false;
     }
 
-    checkCorrect(card: CardDTO, cardImage: Phaser.GameObjects.Image): void {
+    checkCorrect(
+        card: CardDTO,
+        cardImage: Phaser.GameObjects.Image,
+        cardText: Phaser.GameObjects.Text
+    ): void {
         if (card.number === this.currentCalculation.result && !card.marked) {
             card.marked = true;
             cardImage.setTint(0x00ff00);
+            cardImage.disableInteractive();
 
+            this.timerManager.reset(this.duration);
             if (this.checkWin()) {
                 this.scene.start("EndScene");
             } else {
@@ -206,6 +239,12 @@ export default class GameScene extends Phaser.Scene {
                     this.getCalculationText(this.currentCalculation)
                 );
             }
+        } else {
+            // Thay vì xóa, đánh dấu câu hỏi này là bị xóa
+            const currentIndex = this.cardData.findIndex((c) => c === card);
+            this.removedIndexes.add(currentIndex); // Đánh dấu câu hỏi bị xóa
+            cardImage.destroy();
+            cardText.destroy();
         }
     }
 
@@ -215,11 +254,14 @@ export default class GameScene extends Phaser.Scene {
         );
 
         const unusedCalculations = filteredData.filter(
-            (_, index) => !this.usedIndexes.has(index)
+            (_, index) =>
+                !this.usedIndexes.has(index) && !this.removedIndexes.has(index)
         );
 
         if (unusedCalculations.length === 0) {
-            this.usedIndexes.clear();
+            alert("You lose");
+            this.scene.start("MenuScene");
+            return;
         }
 
         const randomCalculation =
@@ -238,5 +280,13 @@ export default class GameScene extends Phaser.Scene {
         this.usedIndexes.add(usedIndex);
     }
 
-    update(): void {}
+    update(): void {
+        const remainingTime = Math.max(0, this.timerManager.getRemainingTime());
+        this.timerText.setText(`Time: ${remainingTime.toFixed(1)}`); // Đếm ngược theo giây
+
+        // Xử lý khi thời gian về 0 (nếu cần thêm logic)
+        if (remainingTime <= 0) {
+            this.timerManager.stop(); // Dừng bộ đếm khi hết thời gian
+        }
+    }
 }

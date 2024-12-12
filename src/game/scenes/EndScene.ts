@@ -34,12 +34,12 @@ export default class EndScene extends Phaser.Scene {
             "Return",
             this.cameras.main.centerX,
             this.cameras.main.centerY + 200,
-            200,
-            300,
+            500,
+            600,
             () => {
-                this.scene.start("SelectDifficulty");
+                this.scene.start("MenuScene");
             },
-            "Button1"
+            "Button2"
         );
 
         new Button(this, returnButtonDTO);
