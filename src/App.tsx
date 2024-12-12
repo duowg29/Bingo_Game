@@ -1,6 +1,6 @@
 import { ChangeEvent, useRef, useState } from "react";
 import { IRefPhaserGame, PhaserGame } from "./game/PhaserGame";
-import { MainMenu } from "./game/scenes/MainMenu";
+import MainMenu from "./game/scenes/MainMenu";
 
 function App() {
     //  References to the PhaserGame component (game and scene are exposed)
