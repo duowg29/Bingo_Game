@@ -219,19 +219,25 @@ export default class GameScene extends Phaser.Scene {
 
         return false;
     }
-
     checkCorrect(
         card: CardDTO,
         cardImage: Phaser.GameObjects.Image,
         cardText: Phaser.GameObjects.Text
     ): void {
         if (card.number === this.currentCalculation.result && !card.marked) {
+            // Đánh dấu ô đúng và cập nhật giao diện
             card.marked = true;
             cardImage.setTint(0x00ff00);
             cardImage.disableInteractive();
 
+            // Đặt lại bộ đếm thời gian
             this.timerManager.reset(this.duration);
+
+            // Kiểm tra chiến thắng hoặc tiếp tục trò chơi
             if (this.checkWin()) {
+                this.scene.start("EndScene");
+            } else if (!this.checkRemainingWinningPaths()) {
+                alert("No more winning paths. Game over!");
                 this.scene.start("EndScene");
             } else {
                 this.updateCalculation(this.bingo.operator[0]);
@@ -240,11 +246,23 @@ export default class GameScene extends Phaser.Scene {
                 );
             }
         } else {
-            // Thay vì xóa, đánh dấu câu hỏi này là bị xóa
-            const currentIndex = this.cardData.findIndex((c) => c === card);
-            this.removedIndexes.add(currentIndex); // Đánh dấu câu hỏi bị xóa
+            // Đánh dấu câu hỏi hiện tại là đã bị loại bỏ
+            const currentIndex = CalculationData.findIndex(
+                (calc) => calc.result === this.currentCalculation.result
+            );
+            if (currentIndex !== -1) {
+                this.removedIndexes.add(currentIndex);
+            }
+
+            // Hủy bỏ giao diện của ô sai
             cardImage.destroy();
             cardText.destroy();
+
+            // Cập nhật câu hỏi mới
+            this.updateCalculation(this.bingo.operator[0]);
+            this.calculationText.setText(
+                this.getCalculationText(this.currentCalculation)
+            );
         }
     }
 
@@ -278,6 +296,38 @@ export default class GameScene extends Phaser.Scene {
 
         const usedIndex = filteredData.indexOf(randomCalculation);
         this.usedIndexes.add(usedIndex);
+    }
+
+    checkRemainingWinningPaths(): boolean {
+        const { cols, rows } = this.bingo;
+
+        // Kiểm tra các hàng
+        for (let row = 0; row < rows; row++) {
+            let possibleWin = false;
+            for (let col = 0; col < cols; col++) {
+                const index = row * cols + col;
+                if (!this.cardData[index].marked) {
+                    possibleWin = true;
+                    break;
+                }
+            }
+            if (possibleWin) return true;
+        }
+
+        // Kiểm tra các cột
+        for (let col = 0; col < cols; col++) {
+            let possibleWin = false;
+            for (let row = 0; row < rows; row++) {
+                const index = row * cols + col;
+                if (!this.cardData[index].marked) {
+                    possibleWin = true;
+                    break;
+                }
+            }
+            if (possibleWin) return true;
+        }
+
+        return false;
     }
 
     update(): void {
