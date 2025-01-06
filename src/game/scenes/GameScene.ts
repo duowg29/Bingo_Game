@@ -225,20 +225,16 @@ export default class GameScene extends Phaser.Scene {
         cardText: Phaser.GameObjects.Text
     ): void {
         if (card.number === this.currentCalculation.result && !card.marked) {
-            // Đánh dấu ô đúng và cập nhật giao diện
             card.marked = true;
             cardImage.setTint(0x00ff00);
             cardImage.disableInteractive();
 
-            // Đặt lại bộ đếm thời gian
             this.timerManager.reset(this.duration);
 
-            // Kiểm tra chiến thắng hoặc tiếp tục trò chơi
             if (this.checkWin()) {
                 this.scene.start("EndScene");
             } else if (!this.checkRemainingWinningPaths()) {
-                alert("No more winning paths. Game over!");
-                this.scene.start("EndScene");
+                this.scene.start("LostScene");
             } else {
                 this.updateCalculation(this.bingo.operator[0]);
                 this.calculationText.setText(
@@ -246,20 +242,31 @@ export default class GameScene extends Phaser.Scene {
                 );
             }
         } else {
-            // Đánh dấu câu hỏi hiện tại là đã bị loại bỏ
-            const currentIndex = CalculationData.findIndex(
-                (calc) => calc.result === this.currentCalculation.result
+            const incorrectAnswer = card.number;
+            const indexToRemove = CalculationData.findIndex(
+                (calc, index) =>
+                    calc.result === incorrectAnswer &&
+                    !this.removedIndexes.has(index) &&
+                    !this.usedIndexes.has(index)
             );
-            if (currentIndex !== -1) {
-                this.removedIndexes.add(currentIndex);
+
+            if (indexToRemove !== -1) {
+                this.removedIndexes.add(indexToRemove); // Đánh dấu câu hỏi bị xóa
+                console.log(
+                    `Removed question: ${
+                        CalculationData[indexToRemove].valueA
+                    } ${this.convertOperatorToSymbol(
+                        CalculationData[indexToRemove].operator[0]
+                    )} ${CalculationData[indexToRemove].valueB} = ${
+                        CalculationData[indexToRemove].result
+                    }`
+                );
             }
 
-            // Hủy bỏ giao diện của ô sai
             cardImage.destroy();
             cardText.destroy();
 
-            // Cập nhật câu hỏi mới
-            this.updateCalculation(this.bingo.operator[0]);
+            // this.updateCalculation(this.bingo.operator[0]);
             this.calculationText.setText(
                 this.getCalculationText(this.currentCalculation)
             );
@@ -277,11 +284,20 @@ export default class GameScene extends Phaser.Scene {
         );
 
         if (unusedCalculations.length === 0) {
-            alert("You lose");
-            this.scene.start("MenuScene");
+            this.scene.start("LostScene");
             return;
         }
 
+        console.log("Unused Calculations:");
+        unusedCalculations.forEach((calc, index) => {
+            console.log(
+                `Question ${index + 1}: ${
+                    calc.valueA
+                } ${this.convertOperatorToSymbol(calc.operator[0])} ${
+                    calc.valueB
+                } = ?`
+            );
+        });
         const randomCalculation =
             unusedCalculations[
                 Math.floor(Math.random() * unusedCalculations.length)
@@ -334,7 +350,6 @@ export default class GameScene extends Phaser.Scene {
         const remainingTime = Math.max(0, this.timerManager.getRemainingTime());
         this.timerText.setText(`Time: ${remainingTime.toFixed(1)}`); // Đếm ngược theo giây
 
-        // Xử lý khi thời gian về 0 (nếu cần thêm logic)
         if (remainingTime <= 0) {
             this.timerManager.stop(); // Dừng bộ đếm khi hết thời gian
         }

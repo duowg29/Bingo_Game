@@ -35,7 +35,6 @@ export default class MenuScene extends Phaser.Scene {
             200,
             300,
             () => {
-                // this.scene.start("EndScene");
                 this.scene.start("SelectDifficulty");
             },
             "Button2"

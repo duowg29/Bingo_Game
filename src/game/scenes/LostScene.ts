@@ -4,9 +4,9 @@ import Button from "../utilities/Button";
 import BackgroundLoader from "../utilities/BackgroundLoader";
 import { textStyle1 } from "../utilities/TextStyle";
 
-export default class EndScene extends Phaser.Scene {
+export default class LostScene extends Phaser.Scene {
     constructor() {
-        super({ key: "EndScene" });
+        super({ key: "LostScene" });
     }
     preload(): void {
         this.load.atlas("Button", "assets/Button.png", "assets/Button.json");
@@ -21,14 +21,14 @@ export default class EndScene extends Phaser.Scene {
             this.cameras.main.centerY
         );
         backgroundLoader.loadBackground();
-        this.add
-            .image(
-                this.cameras.main.centerX,
-                this.cameras.main.centerY,
-                "WinImage"
-            )
-            .setDisplaySize(500, 400)
-            .setOrigin(0.5, 0.5);
+        // this.add
+        //     .image(
+        //         this.cameras.main.centerX,
+        //         this.cameras.main.centerY,
+        //         "WinImage"
+        //     )
+        //     .setDisplaySize(500, 400)
+        //     .setOrigin(0.5, 0.5);
         const returnButtonDTO = new ButtonDTO(
             "returnButton",
             "Return",
