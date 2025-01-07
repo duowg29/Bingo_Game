@@ -8,11 +8,13 @@ export default class LostScene extends Phaser.Scene {
     constructor() {
         super({ key: "LostScene" });
     }
+
     preload(): void {
         this.load.atlas("Button", "assets/Button.png", "assets/Button.json");
         this.load.image("whiteBg", "assets/images/whiteBg.png");
-        this.load.image("WinImage", "assets/images/WinImage.png");
+        this.load.image("LostImage", "assets/images/LostImage.png");
     }
+
     create(): void {
         const backgroundLoader = new BackgroundLoader(
             this,
@@ -21,29 +23,50 @@ export default class LostScene extends Phaser.Scene {
             this.cameras.main.centerY
         );
         backgroundLoader.loadBackground();
-        // this.add
-        //     .image(
-        //         this.cameras.main.centerX,
-        //         this.cameras.main.centerY,
-        //         "WinImage"
-        //     )
-        //     .setDisplaySize(500, 400)
-        //     .setOrigin(0.5, 0.5);
+
+        const lostImage = this.add
+            .image(
+                this.cameras.main.centerX,
+                this.cameras.main.centerY - 100,
+                "LostImage"
+            )
+            .setDisplaySize(300, 300)
+            .setOrigin(0.5);
+
+        this.tweens.add({
+            targets: lostImage,
+            y: lostImage.y + 10,
+            duration: 500,
+            yoyo: true,
+            repeat: -1,
+        });
+
+        this.add
+            .text(
+                this.cameras.main.centerX,
+                this.cameras.main.centerY - 250,
+                "Game Over!",
+                {
+                    font: "50px Arial",
+                    color: "#FF0000",
+                    fontStyle: "bold",
+                }
+            )
+            .setOrigin(0.5);
+
         const returnButtonDTO = new ButtonDTO(
             "returnButton",
-            "Return",
+            "Try Again",
             this.cameras.main.centerX,
             this.cameras.main.centerY + 200,
-            500,
-            600,
+            300,
+            80,
             () => {
-                location.reload();
+                this.scene.start("SelectDifficulty");
             },
             "Button2"
         );
 
         new Button(this, returnButtonDTO);
     }
-
-    update(): void {}
 }

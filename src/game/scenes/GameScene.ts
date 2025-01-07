@@ -18,7 +18,7 @@ export default class GameScene extends Phaser.Scene {
     private duration: number;
     private timerManager: TimerManager;
     private timerText: Phaser.GameObjects.Text;
-    private removedIndexes: Set<number> = new Set(); // Lưu trữ các câu hỏi bị xóa
+    private removedIndexes: Set<number> = new Set();
 
     constructor() {
         super({ key: "GameScene" });
@@ -97,13 +97,12 @@ export default class GameScene extends Phaser.Scene {
         this.timerManager.start();
     }
     onTimeOut(): void {
-        // Hành động khi hết thời gian
         console.log("Time is up!");
         this.updateCalculation(this.bingo.operator[0]);
         this.calculationText.setText(
             this.getCalculationText(this.currentCalculation)
         );
-        this.timerManager.reset(); // Khởi động lại bộ đếm cho câu hỏi mới
+        this.timerManager.reset();
     }
 
     drawCalculation(): void {
@@ -253,7 +252,7 @@ export default class GameScene extends Phaser.Scene {
             );
 
             if (indexToRemove !== -1) {
-                this.removedIndexes.add(indexToRemove); // Đánh dấu câu hỏi bị xóa
+                this.removedIndexes.add(indexToRemove);
                 console.log(
                     `Removed question: ${
                         CalculationData[indexToRemove].valueA
@@ -268,7 +267,6 @@ export default class GameScene extends Phaser.Scene {
             cardImage.destroy();
             cardText.destroy();
 
-            // this.updateCalculation(this.bingo.operator[0]);
             this.calculationText.setText(
                 this.getCalculationText(this.currentCalculation)
             );
@@ -319,7 +317,6 @@ export default class GameScene extends Phaser.Scene {
     checkRemainingWinningPaths(): boolean {
         const { cols, rows } = this.bingo;
 
-        // Kiểm tra các hàng
         for (let row = 0; row < rows; row++) {
             let possibleWin = false;
             for (let col = 0; col < cols; col++) {
@@ -332,7 +329,6 @@ export default class GameScene extends Phaser.Scene {
             if (possibleWin) return true;
         }
 
-        // Kiểm tra các cột
         for (let col = 0; col < cols; col++) {
             let possibleWin = false;
             for (let row = 0; row < rows; row++) {
@@ -350,10 +346,10 @@ export default class GameScene extends Phaser.Scene {
 
     update(): void {
         const remainingTime = Math.max(0, this.timerManager.getRemainingTime());
-        this.timerText.setText(`Time: ${remainingTime.toFixed(1)}`); // Đếm ngược theo giây
+        this.timerText.setText(`Time: ${remainingTime.toFixed(1)}`);
 
         if (remainingTime <= 0) {
-            this.timerManager.stop(); // Dừng bộ đếm khi hết thời gian
+            this.timerManager.stop();
         }
     }
 }

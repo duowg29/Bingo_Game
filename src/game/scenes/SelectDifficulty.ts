@@ -22,6 +22,12 @@ export default class SelectDifficulty extends Phaser.Scene {
     }
 
     create(): void {
+        this.selectedOperator = null;
+        this.selectedDuration = null;
+        this.operatorBoxes = [];
+        this.operatorFills = [];
+        this.durationBoxes = [];
+        this.durationFills = [];
         const backgroundLoader = new BackgroundLoader(
             this,
             "whiteBg",
