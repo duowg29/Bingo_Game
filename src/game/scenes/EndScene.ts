@@ -54,7 +54,8 @@ export default class EndScene extends Phaser.Scene {
             300,
             80,
             () => {
-                this.scene.start("SelectDifficulty");
+                window.location.reload();
+                // this.scene.start("SelectDifficulty");
             },
             "Button2"
         );

@@ -56,13 +56,14 @@ export default class LostScene extends Phaser.Scene {
 
         const returnButtonDTO = new ButtonDTO(
             "returnButton",
-            "Try Again",
+            "Return",
             this.cameras.main.centerX,
             this.cameras.main.centerY + 200,
             300,
             80,
             () => {
-                this.scene.start("SelectDifficulty");
+                window.location.reload();
+                // this.scene.start("SelectDifficulty");
             },
             "Button2"
         );
