@@ -25,6 +25,8 @@ export default class GameScene extends Phaser.Scene {
     }
 
     init(data: { operator: string; duration: number }): void {
+        console.log("Received operator:", data.operator);
+        console.log("Received duration:", data.duration);
         const bingoConfig = BingoData[0];
         this.bingo = new BingoDTO(
             bingoConfig.id,

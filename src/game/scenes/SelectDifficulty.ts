@@ -1,7 +1,6 @@
 import Phaser from "phaser";
 import { ButtonDTO } from "../dto/ButtonDTO";
 import Button from "../utilities/Button";
-import { textStyle1 } from "../utilities/TextStyle";
 import { DurationData } from "../data/DurationData";
 import BackgroundLoader from "../utilities/BackgroundLoader";
 
@@ -9,11 +8,14 @@ export default class SelectDifficulty extends Phaser.Scene {
     private selectedOperator: string | null = null;
     private selectedDuration: number | null = null;
     private operatorBoxes: Phaser.GameObjects.Rectangle[] = [];
+    private operatorFills: Phaser.GameObjects.Rectangle[] = [];
     private durationBoxes: Phaser.GameObjects.Rectangle[] = [];
+    private durationFills: Phaser.GameObjects.Rectangle[] = [];
 
     constructor() {
         super({ key: "SelectDifficulty" });
     }
+
     preload(): void {
         this.load.image("whiteBg", "assets/images/whiteBg.png");
         this.load.image("TeacherImage", "assets/images/TeacherImage.png");
@@ -27,6 +29,7 @@ export default class SelectDifficulty extends Phaser.Scene {
             this.cameras.main.centerY
         );
         backgroundLoader.loadBackground();
+
         this.add
             .text(
                 this.cameras.main.centerX - 200,
@@ -44,7 +47,7 @@ export default class SelectDifficulty extends Phaser.Scene {
             .setOrigin(0.5, 0.5);
 
         this.add
-            .text(100, 260, "What kind?", {
+            .text(100, 260, "Operator?", {
                 font: "30px Arial",
                 color: "#000000",
             })
@@ -57,30 +60,32 @@ export default class SelectDifficulty extends Phaser.Scene {
             "Division",
         ];
         operators.forEach((operator, index) => {
-            const box = this.createCheckBox(
+            const { box, fill } = this.createCheckBox(
                 100,
                 100 + index * 30,
                 operator,
                 () => this.selectOperator(operator, index)
             );
             this.operatorBoxes.push(box);
+            this.operatorFills.push(fill);
         });
 
         this.add
-            .text(100, 450, "How Fast?", {
+            .text(100, 450, "Difficulty", {
                 font: "30px Arial",
                 color: "#000000",
             })
             .setOrigin(0);
 
         DurationData.forEach((difficulty, index) => {
-            const box = this.createCheckBox(
+            const { box, fill } = this.createCheckBox(
                 100,
                 300 + index * 30,
                 difficulty.key,
                 () => this.selectDuration(difficulty.duration, index)
             );
             this.durationBoxes.push(box);
+            this.durationFills.push(fill);
         });
 
         const startButtonDTO = new ButtonDTO(
@@ -102,12 +107,21 @@ export default class SelectDifficulty extends Phaser.Scene {
         y: number,
         label: string,
         onClick: () => void
-    ): Phaser.GameObjects.Rectangle {
+    ): {
+        box: Phaser.GameObjects.Rectangle;
+        fill: Phaser.GameObjects.Rectangle;
+    } {
         const box = this.add
-            .rectangle(x, y + 210, 20, 20, 0x000000)
+            .rectangle(x, y + 210, 20, 20)
+            .setStrokeStyle(2, 0x000000)
             .setInteractive();
-        const text = this.add.text(x + 30, y + 195, label, {
-            font: "30px Arial",
+
+        const fill = this.add
+            .rectangle(x, y + 210, 15, 15, 0x000000)
+            .setVisible(false);
+
+        this.add.text(x + 30, y + 195, label, {
+            font: "20px Arial",
             color: "#000000",
         });
 
@@ -115,33 +129,42 @@ export default class SelectDifficulty extends Phaser.Scene {
             onClick();
         });
 
-        return box;
+        return { box, fill };
     }
+
+    private deselectAll(fills: Phaser.GameObjects.Rectangle[]): void {
+        fills.forEach((fill) => fill.setVisible(false));
+    }
+
     private selectOperator(operator: string, index: number): void {
         if (this.selectedOperator === operator) {
-            this.operatorBoxes[index].setFillStyle(0x000000);
+            this.deselectAll(this.operatorFills);
             this.selectedOperator = null;
         } else {
-            this.operatorBoxes.forEach((box) => box.setFillStyle(0x000000));
-            this.operatorBoxes[index].setFillStyle(0x00ff00);
+            this.deselectAll(this.operatorFills);
+            this.operatorFills[index].setVisible(true);
             this.selectedOperator = operator;
         }
     }
+
     private selectDuration(duration: number, index: number): void {
         if (this.selectedDuration === duration) {
-            this.durationBoxes[index].setFillStyle(0x000000);
+            this.deselectAll(this.durationFills);
             this.selectedDuration = null;
         } else {
-            this.durationBoxes.forEach((box) => box.setFillStyle(0x000000));
-            this.durationBoxes[index].setFillStyle(0x00ff00);
+            this.deselectAll(this.durationFills);
+            this.durationFills[index].setVisible(true);
             this.selectedDuration = duration;
         }
     }
+
     private startGame(): void {
         if (this.selectedOperator === null || this.selectedDuration === null) {
             alert("Please select one operator and one difficulty level.");
             return;
         }
+        console.log("Selected operator:", this.selectedOperator);
+        console.log("Selected duration:", this.selectedDuration);
         this.scene.start("GameScene", {
             operator: this.selectedOperator,
             duration: this.selectedDuration,
