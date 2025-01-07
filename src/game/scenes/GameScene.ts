@@ -234,9 +234,11 @@ export default class GameScene extends Phaser.Scene {
 
             if (this.checkWin()) {
                 this.scene.start("EndScene");
-            } else if (!this.checkRemainingWinningPaths()) {
-                this.scene.start("LostScene");
-            } else {
+            }
+            // else if (!this.checkRemainingWinningPaths()) {
+            //     this.scene.start("LostScene");
+            // }
+            else {
                 this.updateCalculation(this.bingo.operator[0]);
                 this.calculationText.setText(
                     this.getCalculationText(this.currentCalculation)
