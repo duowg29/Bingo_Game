@@ -74,6 +74,11 @@ export default class SelectDifficulty extends Phaser.Scene {
             );
             this.operatorBoxes.push(box);
             this.operatorFills.push(fill);
+
+            if (index === 0) {
+                fill.setVisible(true);
+                this.selectedOperator = operator;
+            }
         });
 
         this.add
@@ -92,6 +97,11 @@ export default class SelectDifficulty extends Phaser.Scene {
             );
             this.durationBoxes.push(box);
             this.durationFills.push(fill);
+
+            if (index === 0) {
+                fill.setVisible(true);
+                this.selectedDuration = difficulty.duration;
+            }
         });
 
         const startButtonDTO = new ButtonDTO(
@@ -105,7 +115,15 @@ export default class SelectDifficulty extends Phaser.Scene {
             "Button2"
         );
 
-        new Button(this, startButtonDTO);
+        const startButton = new Button(this, startButtonDTO);
+
+        startButton.button.on("pointerover", () => {
+            this.input.setDefaultCursor("pointer");
+        });
+
+        startButton.button.on("pointerout", () => {
+            this.input.setDefaultCursor("default");
+        });
     }
 
     private createCheckBox(
@@ -116,6 +134,7 @@ export default class SelectDifficulty extends Phaser.Scene {
     ): {
         box: Phaser.GameObjects.Rectangle;
         fill: Phaser.GameObjects.Rectangle;
+        text: Phaser.GameObjects.Text;
     } {
         const box = this.add
             .rectangle(x, y + 210, 20, 20)
@@ -126,16 +145,29 @@ export default class SelectDifficulty extends Phaser.Scene {
             .rectangle(x, y + 210, 15, 15, 0x000000)
             .setVisible(false);
 
-        this.add.text(x + 30, y + 195, label, {
-            font: "20px Arial",
-            color: "#000000",
-        });
+        const text = this.add
+            .text(x + 30, y + 200, label, {
+                font: "20px Arial",
+                color: "#000000",
+            })
+            .setInteractive();
 
-        box.on("pointerdown", () => {
-            onClick();
-        });
+        box.on("pointerdown", onClick);
+        text.on("pointerdown", onClick);
 
-        return { box, fill };
+        const setHoverCursor = (item: Phaser.GameObjects.GameObject) => {
+            item.on("pointerover", () => {
+                this.input.setDefaultCursor("pointer");
+            });
+            item.on("pointerout", () => {
+                this.input.setDefaultCursor("default");
+            });
+        };
+
+        setHoverCursor(box);
+        setHoverCursor(text);
+
+        return { box, fill, text };
     }
 
     private deselectAll(fills: Phaser.GameObjects.Rectangle[]): void {
@@ -144,24 +176,22 @@ export default class SelectDifficulty extends Phaser.Scene {
 
     private selectOperator(operator: string, index: number): void {
         if (this.selectedOperator === operator) {
-            this.deselectAll(this.operatorFills);
-            this.selectedOperator = null;
-        } else {
-            this.deselectAll(this.operatorFills);
-            this.operatorFills[index].setVisible(true);
-            this.selectedOperator = operator;
+            return;
         }
+
+        this.deselectAll(this.operatorFills);
+        this.operatorFills[index].setVisible(true);
+        this.selectedOperator = operator;
     }
 
     private selectDuration(duration: number, index: number): void {
         if (this.selectedDuration === duration) {
-            this.deselectAll(this.durationFills);
-            this.selectedDuration = null;
-        } else {
-            this.deselectAll(this.durationFills);
-            this.durationFills[index].setVisible(true);
-            this.selectedDuration = duration;
+            return;
         }
+
+        this.deselectAll(this.durationFills);
+        this.durationFills[index].setVisible(true);
+        this.selectedDuration = duration;
     }
 
     private startGame(): void {

@@ -1,5 +1,4 @@
-Thiết kế lại giao diện
-viết hàm checkwin (theo cột hoặc hàng)
-Vẽ container cho calculation
-Nếu chọn sai thì ẩn thẻ
-Làm duration
+4. Animation timer chưa đúng
+5. Animation nhân vật chưa đúng
+6. Audio chưa có và chưa khớp
+7. Điều kiện thua chưa đúng

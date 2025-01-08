@@ -87,12 +87,62 @@ export default class GameScene extends Phaser.Scene {
         this.drawCalculation();
         this.drawCards();
 
-        this.timerText = this.add
-            .text(this.cameras.main.centerX, 50, `Time: ${this.duration}`, {
-                fontSize: "24px",
-                color: "#ff0000",
-            })
-            .setOrigin(0.5);
+        // Tọa độ và kích thước đồng hồ
+        const timerX = this.cameras.main.centerX;
+        const timerY = 50;
+        const timerRadius = 40; // Bán kính đồng hồ
+
+        // Vẽ viền đen của đồng hồ
+        const timerClock = this.add.graphics();
+        timerClock.lineStyle(4, 0x000000, 1); // Đường viền màu đen, độ dày 4px
+        timerClock.strokeCircle(timerX, timerY, timerRadius); // Vẽ đường tròn viền ngoài
+
+        // Tạo graphics cho phần màu xanh
+        const timerArc = this.add.graphics();
+        timerArc.setDepth(1); // Đảm bảo phần màu xanh nằm trên cùng
+
+        // Khởi tạo thời gian
+        let remainingTime = this.duration; // Tổng thời gian đếm ngược (giây)
+        const initialAngle = Phaser.Math.DegToRad(270); // Bắt đầu từ đỉnh (270 độ)
+
+        // Hàm cập nhật đồng hồ
+        const updateClock = () => {
+            // Xóa hình vẽ cũ
+            timerArc.clear();
+
+            // Tính tiến trình còn lại (progress từ 1 -> 0)
+            const progress = remainingTime / this.duration;
+            const endAngle = initialAngle - progress * Phaser.Math.PI2; // Góc kết thúc
+
+            // Kiểm tra nếu hết thời gian
+            if (remainingTime <= 0) {
+                this.onTimeOut();
+                return;
+            }
+
+            // Vẽ phần màu xanh (progress bar)
+            timerArc.fillStyle(0x007bff, 1); // Màu xanh với độ trong suốt 1
+            timerArc.slice(
+                timerX, // Tọa độ X
+                timerY, // Tọa độ Y
+                timerRadius - 5, // Bán kính bên trong (trừ viền)
+                initialAngle, // Góc bắt đầu
+                endAngle, // Góc kết thúc
+                true // Vẽ theo chiều kim đồng hồ
+            );
+            timerArc.fillPath();
+
+            // Cập nhật thời gian còn lại
+            remainingTime -= 1 / 60; // Trừ dần thời gian (60 FPS)
+        };
+
+        // Tạo sự kiện chạy liên tục để cập nhật đồng hồ
+        this.time.addEvent({
+            delay: 1000 / 60, // Tần số cập nhật (60 FPS)
+            callback: updateClock,
+            callbackScope: this,
+            loop: true, // Lặp lại liên tục
+        });
 
         this.timerManager.start();
     }
@@ -348,7 +398,7 @@ export default class GameScene extends Phaser.Scene {
 
     update(): void {
         const remainingTime = Math.max(0, this.timerManager.getRemainingTime());
-        this.timerText.setText(`Time: ${remainingTime.toFixed(1)}`);
+        // this.timerText.setText(`Time: ${remainingTime.toFixed(1)}`);
 
         if (remainingTime <= 0) {
             this.timerManager.stop();
