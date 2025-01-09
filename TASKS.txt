@@ -1,4 +1,10 @@
-4. Animation timer chưa đúng
 5. Animation nhân vật chưa đúng
 6. Audio chưa có và chưa khớp
 7. Điều kiện thua chưa đúng
+
+-Sửa lại logic on time out
+-Sửa lại các thiết kế
+-Làm responsive cho điện thoại
+-push code maze lên github
+-Chọn Game mới
+

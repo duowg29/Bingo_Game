@@ -47,6 +47,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload(): void {
+        this.load.spritesheet("explosion", "assets/sprite/explosion.png", {
+            frameWidth: 1500,
+            frameHeight: 1500,
+        });
         this.load.atlas(
             "BingoCard",
             "assets/BingoCard.png",
@@ -61,6 +65,15 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create(): void {
+        this.anims.create({
+            key: "explode",
+            frames: this.anims.generateFrameNumbers("explosion", {
+                start: 0,
+                end: 8,
+            }),
+            frameRate: 10,
+            repeat: 0,
+        });
         const backgroundLoader = new BackgroundLoader(
             this,
             "whiteBg",
@@ -90,29 +103,27 @@ export default class GameScene extends Phaser.Scene {
         // Tọa độ và kích thước đồng hồ
         const timerX = this.cameras.main.centerX;
         const timerY = 50;
-        const timerRadius = 40; // Bán kính đồng hồ
+        const timerRadius = 40;
 
         // Vẽ viền đen của đồng hồ
         const timerClock = this.add.graphics();
-        timerClock.lineStyle(4, 0x000000, 1); // Đường viền màu đen, độ dày 4px
-        timerClock.strokeCircle(timerX, timerY, timerRadius); // Vẽ đường tròn viền ngoài
+        timerClock.lineStyle(4, 0x000000, 1);
+        timerClock.strokeCircle(timerX, timerY, timerRadius);
 
         // Tạo graphics cho phần màu xanh
         const timerArc = this.add.graphics();
-        timerArc.setDepth(1); // Đảm bảo phần màu xanh nằm trên cùng
+        timerArc.setDepth(1);
 
         // Khởi tạo thời gian
-        let remainingTime = this.duration; // Tổng thời gian đếm ngược (giây)
-        const initialAngle = Phaser.Math.DegToRad(270); // Bắt đầu từ đỉnh (270 độ)
+        let remainingTime = this.duration;
+        const initialAngle = Phaser.Math.DegToRad(270);
 
         // Hàm cập nhật đồng hồ
         const updateClock = () => {
             // Xóa hình vẽ cũ
             timerArc.clear();
 
-            // Tính tiến trình còn lại (progress từ 1 -> 0)
-            const progress = remainingTime / this.duration;
-            const endAngle = initialAngle - progress * Phaser.Math.PI2; // Góc kết thúc
+            remainingTime = Math.max(0, this.timerManager.getRemainingTime());
 
             // Kiểm tra nếu hết thời gian
             if (remainingTime <= 0) {
@@ -120,28 +131,29 @@ export default class GameScene extends Phaser.Scene {
                 return;
             }
 
+            // Tính tiến trình còn lại (progress từ 1 -> 0)
+            const progress = remainingTime / this.duration;
+            const endAngle = initialAngle - progress * Phaser.Math.PI2;
+
             // Vẽ phần màu xanh (progress bar)
-            timerArc.fillStyle(0x007bff, 1); // Màu xanh với độ trong suốt 1
+            timerArc.fillStyle(0x007bff, 1);
             timerArc.slice(
-                timerX, // Tọa độ X
-                timerY, // Tọa độ Y
-                timerRadius - 5, // Bán kính bên trong (trừ viền)
-                initialAngle, // Góc bắt đầu
-                endAngle, // Góc kết thúc
-                true // Vẽ theo chiều kim đồng hồ
+                timerX,
+                timerY,
+                timerRadius - 5,
+                initialAngle,
+                endAngle,
+                true
             );
             timerArc.fillPath();
-
-            // Cập nhật thời gian còn lại
-            remainingTime -= 1 / 60; // Trừ dần thời gian (60 FPS)
         };
 
         // Tạo sự kiện chạy liên tục để cập nhật đồng hồ
         this.time.addEvent({
-            delay: 1000 / 60, // Tần số cập nhật (60 FPS)
+            delay: 1000 / 60,
             callback: updateClock,
             callbackScope: this,
-            loop: true, // Lặp lại liên tục
+            loop: true,
         });
 
         this.timerManager.start();
@@ -276,12 +288,29 @@ export default class GameScene extends Phaser.Scene {
         cardText: Phaser.GameObjects.Text
     ): void {
         if (card.number === this.currentCalculation.result && !card.marked) {
+            const explosion1 = this.add
+                .sprite(200, 100, "explosion")
+                .setDisplaySize(150, 150);
+            explosion1.play("explode");
+
+            explosion1.on("animationcomplete", () => {
+                explosion1.destroy();
+            });
+
+            const explosion2 = this.add
+                .sprite(600, 100, "explosion")
+                .setDisplaySize(150, 150);
+            explosion2.play("explode");
+
+            explosion2.on("animationcomplete", () => {
+                explosion2.destroy();
+            });
             card.marked = true;
             cardImage.setTint(0x00ff00);
             cardImage.disableInteractive();
 
             this.timerManager.reset(this.duration);
-
+            console.log(`Timer reset to: ${this.duration} seconds`);
             if (this.checkWin()) {
                 this.scene.start("EndScene");
             }
@@ -398,7 +427,6 @@ export default class GameScene extends Phaser.Scene {
 
     update(): void {
         const remainingTime = Math.max(0, this.timerManager.getRemainingTime());
-        // this.timerText.setText(`Time: ${remainingTime.toFixed(1)}`);
 
         if (remainingTime <= 0) {
             this.timerManager.stop();
