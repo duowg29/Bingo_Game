@@ -3,8 +3,11 @@ import { ButtonDTO } from "../dto/ButtonDTO";
 import Button from "../utilities/Button";
 import BackgroundLoader from "../utilities/BackgroundLoader";
 import { textStyle1 } from "../utilities/TextStyle";
+import SoundManager from "../utilities/SoundManager";
 
 export default class MenuScene extends Phaser.Scene {
+    public soundManager: SoundManager | null = null;
+
     constructor() {
         super({ key: "MenuScene" });
     }
@@ -12,8 +15,13 @@ export default class MenuScene extends Phaser.Scene {
         this.load.atlas("Button", "assets/Button.png", "assets/Button.json");
         this.load.image("whiteBg", "assets/images/whiteBg.png");
         this.load.image("BingoImage", "assets/images/BingoImage.png");
+        this.soundManager = new SoundManager(this, ["BackgroundMusic"]);
+        this.soundManager.preload();
     }
     create(): void {
+        if (this.soundManager) {
+            this.soundManager.play("BackgroundMusic", true);
+        }
         const backgroundLoader = new BackgroundLoader(
             this,
             "whiteBg",

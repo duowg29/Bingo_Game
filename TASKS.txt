@@ -1,9 +1,10 @@
 5. Animation nhân vật chưa đúng
-6. Audio chưa có và chưa khớp
+6. Audio chưa có và chưa khớp (thêm audio khi tả lời đúng)
 7. Điều kiện thua chưa đúng
 
 -Sửa lại logic on time out
--Sửa lại các thiết kế
+
+-Sửa lại các thiết kế ( chọn ảnh cho đẹp)
 -Làm responsive cho điện thoại
 -push code maze lên github
 -Chọn Game mới
