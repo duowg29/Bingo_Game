@@ -8,10 +8,12 @@ import { CalculationData } from "../data/CalculationData";
 import BackgroundLoader from "../utilities/BackgroundLoader";
 import TimerManager from "../utilities/TimerManager";
 import MenuScene from "./MenuScene";
+import SoundManager from "../utilities/SoundManager";
 
 export default class GameScene extends Phaser.Scene {
     private bingo: BingoDTO;
     private cardData: CardDTO[] = [];
+    public soundManager: SoundManager | null = null;
     private currentCalculation: CalculationDTO;
     private calculationText: Phaser.GameObjects.Text;
     private usedIndexes: Set<number> = new Set();
@@ -48,8 +50,8 @@ export default class GameScene extends Phaser.Scene {
 
     preload(): void {
         this.load.spritesheet("explosion", "assets/sprite/explosion.png", {
-            frameWidth: 1500,
-            frameHeight: 1500,
+            frameWidth: 160,
+            frameHeight: 160,
         });
         this.load.atlas(
             "BingoCard",
@@ -62,9 +64,14 @@ export default class GameScene extends Phaser.Scene {
             "assets/CalculationCard.json"
         );
         this.load.image("whiteBg", "assets/images/whiteBg.png");
+        this.soundManager = new SoundManager(this, ["ScoreMusic"]);
+        this.soundManager.preload();
     }
 
     create(): void {
+        if (this.soundManager) {
+            this.soundManager.play("ScoreMusic", false);
+        }
         this.anims.create({
             key: "explode",
             frames: this.anims.generateFrameNumbers("explosion", {
@@ -313,11 +320,9 @@ export default class GameScene extends Phaser.Scene {
             console.log(`Timer reset to: ${this.duration} seconds`);
             if (this.checkWin()) {
                 this.scene.start("EndScene");
-            }
-            // else if (!this.checkRemainingWinningPaths()) {
-            //     this.scene.start("LostScene");
-            // }
-            else {
+            } else if (!this.checkRemainingWinningPaths()) {
+                this.scene.start("LostScene");
+            } else {
                 this.updateCalculation(this.bingo.operator[0]);
                 this.calculationText.setText(
                     this.getCalculationText(this.currentCalculation)
@@ -399,27 +404,27 @@ export default class GameScene extends Phaser.Scene {
         const { cols, rows } = this.bingo;
 
         for (let row = 0; row < rows; row++) {
-            let possibleWin = false;
+            let canWin = false;
             for (let col = 0; col < cols; col++) {
                 const index = row * cols + col;
                 if (!this.cardData[index].marked) {
-                    possibleWin = true;
+                    canWin = true;
                     break;
                 }
             }
-            if (possibleWin) return true;
+            if (canWin) return true;
         }
 
         for (let col = 0; col < cols; col++) {
-            let possibleWin = false;
+            let canWin = false;
             for (let row = 0; row < rows; row++) {
                 const index = row * cols + col;
                 if (!this.cardData[index].marked) {
-                    possibleWin = true;
+                    canWin = true;
                     break;
                 }
             }
-            if (possibleWin) return true;
+            if (canWin) return true;
         }
 
         return false;
