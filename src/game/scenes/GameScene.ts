@@ -164,6 +164,12 @@ export default class GameScene extends Phaser.Scene {
         });
 
         this.timerManager.start();
+        this.scale.on("resize", this.resize, this);
+    }
+    resize(gameSize: Phaser.Structs.Size): void {
+        const width = gameSize.width;
+        const height = gameSize.height;
+        this.cameras.resize(width, height);
     }
     onTimeOut(): void {
         console.log("Time is up!");

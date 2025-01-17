@@ -45,8 +45,6 @@ export default class MenuScene extends Phaser.Scene {
     resize(gameSize: Phaser.Structs.Size): void {
         const width = gameSize.width;
         const height = gameSize.height;
-
-        // Cập nhật lại các thành phần theo kích thước mới
         this.cameras.resize(width, height);
     }
 }

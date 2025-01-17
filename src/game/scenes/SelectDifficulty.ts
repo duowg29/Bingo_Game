@@ -35,6 +35,7 @@ export default class SelectDifficulty extends Phaser.Scene {
         this.operatorFills = [];
         this.durationBoxes = [];
         this.durationFills = [];
+
         const backgroundLoader = new BackgroundLoader(
             this,
             "whiteBg",
@@ -43,27 +44,37 @@ export default class SelectDifficulty extends Phaser.Scene {
         );
         backgroundLoader.loadBackground();
 
-        this.add
+        const titleText = this.add
             .text(
-                this.cameras.main.centerX - 200,
-                this.cameras.main.centerY - 300,
+                this.scale.width / 2,
+                this.scale.height * 0.2,
                 "Select Difficulty",
                 {
                     font: "60px Arial",
                     color: "#000000",
                 }
             )
-            .setOrigin(0);
-        this.add
-            .image(500, 400, "TeacherImage")
-            .setDisplaySize(300, 300)
+            .setOrigin(0.5);
+
+        const teacherImage = this.add
+            .image(
+                this.scale.width / 1.5,
+                this.scale.height * 0.4,
+                "TeacherImage"
+            )
+            .setDisplaySize(this.scale.width * 0.3, this.scale.height * 0.3)
             .setOrigin(0.5, 0.5);
 
-        this.add
-            .text(100, 260, "Operator?", {
-                font: "30px Arial",
-                color: "#000000",
-            })
+        const operatorText = this.add
+            .text(
+                this.scale.width * 0.2,
+                this.scale.height * 0.4,
+                "Operator?",
+                {
+                    font: "30px Arial",
+                    color: "#000000",
+                }
+            )
             .setOrigin(0);
 
         const operators = [
@@ -74,8 +85,8 @@ export default class SelectDifficulty extends Phaser.Scene {
         ];
         operators.forEach((operator, index) => {
             const { box, fill } = this.createCheckBox(
-                100,
-                100 + index * 30,
+                this.scale.width * 0.2,
+                this.scale.height * 0.46 + index * 30,
                 operator,
                 () => this.selectOperator(operator, index)
             );
@@ -88,17 +99,22 @@ export default class SelectDifficulty extends Phaser.Scene {
             }
         });
 
-        this.add
-            .text(100, 450, "Difficulty", {
-                font: "30px Arial",
-                color: "#000000",
-            })
+        const difficultyText = this.add
+            .text(
+                this.scale.width * 0.2,
+                this.scale.height * 0.6,
+                "Difficulty",
+                {
+                    font: "30px Arial",
+                    color: "#000000",
+                }
+            )
             .setOrigin(0);
 
         DurationData.forEach((difficulty, index) => {
             const { box, fill } = this.createCheckBox(
-                100,
-                300 + index * 30,
+                this.scale.width * 0.2,
+                this.scale.height * 0.66 + index * 30,
                 difficulty.key,
                 () => this.selectDuration(difficulty.duration, index)
             );
@@ -114,22 +130,31 @@ export default class SelectDifficulty extends Phaser.Scene {
         const startButtonDTO = new ButtonDTO(
             "startButton",
             "Start",
-            550,
-            600,
-            200,
-            300,
+            this.scale.width / 1.4,
+            this.scale.height * 0.65,
+            this.scale.width * 0.2,
+            this.scale.height * 0.1,
             this.startGame.bind(this),
             "Button2"
         );
 
-        const startButton = new Button(this, startButtonDTO);
+        new Button(this, startButtonDTO);
 
-        startButton.button.on("pointerover", () => {
-            this.input.setDefaultCursor("pointer");
-        });
+        this.scale.on("resize", this.resize, this);
+    }
 
-        startButton.button.on("pointerout", () => {
-            this.input.setDefaultCursor("default");
+    resize(gameSize: Phaser.Structs.Size): void {
+        const width = gameSize.width;
+        const height = gameSize.height;
+
+        this.cameras.resize(width, height);
+
+        // Cập nhật vị trí của các thành phần
+        this.children.list.forEach((child) => {
+            if (child instanceof Phaser.GameObjects.Text) {
+            } else if (child instanceof Phaser.GameObjects.Image) {
+            } else if (child instanceof Phaser.GameObjects.Rectangle) {
+            }
         });
     }
 
@@ -144,16 +169,16 @@ export default class SelectDifficulty extends Phaser.Scene {
         text: Phaser.GameObjects.Text;
     } {
         const box = this.add
-            .rectangle(x, y + 210, 20, 20)
+            .rectangle(x, y, 20, 20)
             .setStrokeStyle(2, 0x000000)
             .setInteractive();
 
         const fill = this.add
-            .rectangle(x, y + 210, 15, 15, 0x000000)
+            .rectangle(x, y, 15, 15, 0x000000)
             .setVisible(false);
 
         const text = this.add
-            .text(x + 30, y + 200, label, {
+            .text(x + 30, y - 10, label, {
                 font: "20px Arial",
                 color: "#000000",
             })
