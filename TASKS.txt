@@ -1,6 +1,5 @@
-7. Điều kiện thua chưa đúng
+Sửa lại toàn bộ logic game
 
 -Sửa lại các thiết kế ( chọn ảnh cho đẹp)
 -push code maze lên github
--Chọn Game mới
 
