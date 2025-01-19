@@ -149,7 +149,6 @@ export default class SelectDifficulty extends Phaser.Scene {
 
         this.cameras.resize(width, height);
 
-        // Cập nhật vị trí của các thành phần
         this.children.list.forEach((child) => {
             if (child instanceof Phaser.GameObjects.Text) {
             } else if (child instanceof Phaser.GameObjects.Image) {

@@ -50,8 +50,6 @@ export const CalculationData = [
     { valueA: 6, valueB: 5, result: 1, operator: "Subtraction" },
     { valueA: 8, valueB: 3, result: 5, operator: "Subtraction" },
     { valueA: 7, valueB: 6, result: 1, operator: "Subtraction" },
-    { valueA: 5, valueB: 1, result: 4, operator: "Subtraction" },
-    { valueA: 9, valueB: 7, result: 2, operator: "Subtraction" },
     { valueA: 1, valueB: 2, result: 2, operator: "Multiplication" },
     { valueA: 3, valueB: 3, result: 9, operator: "Multiplication" },
     { valueA: 2, valueB: 4, result: 8, operator: "Multiplication" },
@@ -102,5 +100,4 @@ export const CalculationData = [
     { valueA: 4, valueB: 2, result: 2, operator: "Division" },
     { valueA: 6, valueB: 3, result: 2, operator: "Division" },
     { valueA: 8, valueB: 2, result: 4, operator: "Division" },
-    { valueA: 9, valueB: 1, result: 9, operator: "Division" },
 ];

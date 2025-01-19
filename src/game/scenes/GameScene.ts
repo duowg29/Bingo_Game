@@ -305,25 +305,21 @@ export default class GameScene extends Phaser.Scene {
                 .sprite(200, 100, "explosion")
                 .setDisplaySize(150, 150);
             explosion1.play("explode");
-
-            explosion1.on("animationcomplete", () => {
-                explosion1.destroy();
-            });
+            explosion1.on("animationcomplete", () => explosion1.destroy());
 
             const explosion2 = this.add
                 .sprite(600, 100, "explosion")
                 .setDisplaySize(150, 150);
             explosion2.play("explode");
+            explosion2.on("animationcomplete", () => explosion2.destroy());
 
-            explosion2.on("animationcomplete", () => {
-                explosion2.destroy();
-            });
             card.marked = true;
             cardImage.setTint(0x00ff00);
             cardImage.disableInteractive();
 
             this.timerManager.reset(this.duration);
             console.log(`Timer reset to: ${this.duration} seconds`);
+
             if (this.checkWin()) {
                 this.scene.start("EndScene");
             } else if (!this.checkRemainingWinningPaths()) {
@@ -335,6 +331,7 @@ export default class GameScene extends Phaser.Scene {
                 );
             }
         } else {
+            // Xử lý trường hợp trả lời sai
             const incorrectAnswer = card.number;
             const indexToRemove = CalculationData.findIndex(
                 (calc, index) =>
@@ -364,7 +361,6 @@ export default class GameScene extends Phaser.Scene {
             );
         }
     }
-
     updateCalculation(operator: string): void {
         const filteredData = CalculationData.filter((calc) =>
             calc.operator.includes(operator)
@@ -405,34 +401,43 @@ export default class GameScene extends Phaser.Scene {
         const usedIndex = filteredData.indexOf(randomCalculation);
         this.usedIndexes.add(usedIndex);
     }
-
     checkRemainingWinningPaths(): boolean {
         const { cols, rows } = this.bingo;
 
         for (let row = 0; row < rows; row++) {
-            let canWin = false;
+            let cellCount = 0;
             for (let col = 0; col < cols; col++) {
                 const index = row * cols + col;
-                if (!this.cardData[index].marked) {
-                    canWin = true;
-                    break;
+                if (this.cardData[index]) {
+                    cellCount++;
+                    if (cellCount === 5) {
+                        console.log(`Hàng ${row + 1} vẫn còn đủ 5 ô.`);
+                        return true;
+                    }
+                } else {
+                    cellCount = 0;
                 }
             }
-            if (canWin) return true;
         }
 
-        for (let col = 0; col < cols; col++) {
-            let canWin = false;
+        // Kiểm tra tất cả các cột
+        for (let col = 0; col < cols; col) {
+            let cellCount = 0;
             for (let row = 0; row < rows; row++) {
                 const index = row * cols + col;
-                if (!this.cardData[index].marked) {
-                    canWin = true;
-                    break;
+                if (this.cardData[index]) {
+                    cellCount++;
+                    if (cellCount === 5) {
+                        console.log(`Cột ${col + 1} vẫn còn đủ 5 ô.`);
+                        return true;
+                    }
+                } else {
+                    cellCount = 0;
                 }
             }
-            if (canWin) return true;
         }
 
+        console.log("Không còn hàng hoặc cột nào có đủ 5 ô.");
         return false;
     }
 
