@@ -13,6 +13,6 @@ export class CalculationDTO {
         this.valueA = valueA;
         this.valueB = valueB;
         this.result = result;
-        this.operator = operator;
+        this.operator = operator || [];
     }
 }
