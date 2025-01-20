@@ -9,7 +9,6 @@ import BackgroundLoader from "../utilities/BackgroundLoader";
 import TimerManager from "../utilities/TimerManager";
 import MenuScene from "./MenuScene";
 import SoundManager from "../utilities/SoundManager";
-import ClockManager from "../utilities/ClockManager";
 import CardDrawer from "../utilities/CardDrawer";
 import CalculationDrawer from "../utilities/CalculationDrawer";
 
@@ -24,7 +23,6 @@ export default class GameScene extends Phaser.Scene {
     private timerManager: TimerManager;
     private timerText: Phaser.GameObjects.Text;
     private removedIndexes: Set<number> = new Set();
-    private clockManager: ClockManager;
     private calculationDrawer: CalculationDrawer;
 
     constructor() {
@@ -115,7 +113,6 @@ export default class GameScene extends Phaser.Scene {
         }
         this.calculationDrawer.drawCalculation(this.currentCalculation);
 
-        // Update calculation text ngay khi game bắt đầu
         if (!this.calculationText) {
             this.calculationText = this.add
                 .text(this.cameras.main.centerX, 150, "", {
@@ -127,7 +124,6 @@ export default class GameScene extends Phaser.Scene {
                 .setOrigin(0.5, 0.5);
         }
 
-        // Vẽ calculation text ngay lập tức
         this.calculationText.setText(
             this.calculationDrawer.getCalculationText(this.currentCalculation)
         );
@@ -138,16 +134,49 @@ export default class GameScene extends Phaser.Scene {
         const timerY = 50;
         const timerRadius = 40;
 
-        this.clockManager = new ClockManager(
-            this,
-            this.duration,
-            this.onTimeOut.bind(this),
-            timerX,
-            timerY,
-            timerRadius
-        );
+        const timerClock = this.add.graphics();
+        timerClock.lineStyle(4, 0x000000, 1);
+        timerClock.strokeCircle(timerX, timerY, timerRadius);
 
-        this.clockManager.start();
+        const timerArc = this.add.graphics();
+        timerArc.setDepth(1);
+
+        let remainingTime = this.duration;
+        const initialAngle = Phaser.Math.DegToRad(270);
+
+        // Hàm cập nhật đồng hồ
+        const updateClock = () => {
+            timerArc.clear();
+
+            remainingTime = Math.max(0, this.timerManager.getRemainingTime());
+
+            if (remainingTime <= 0) {
+                this.onTimeOut();
+                return;
+            }
+
+            const progress = remainingTime / this.duration;
+            const endAngle = initialAngle - progress * Phaser.Math.PI2;
+
+            timerArc.fillStyle(0x007bff, 1);
+            timerArc.slice(
+                timerX,
+                timerY,
+                timerRadius - 5,
+                initialAngle,
+                endAngle,
+                true
+            );
+            timerArc.fillPath();
+        };
+
+        this.time.addEvent({
+            delay: 1000 / 60,
+            callback: updateClock,
+            callbackScope: this,
+            loop: true,
+        });
+
         this.timerManager.start();
         this.scale.on("resize", this.resize, this);
     }
@@ -157,10 +186,47 @@ export default class GameScene extends Phaser.Scene {
         this.cameras.resize(width, height);
     }
     onTimeOut(): void {
-        this.updateCalculation(this.bingo.operator[0]);
-        this.calculationText.setText(
-            this.calculationDrawer.getCalculationText(this.currentCalculation)
+        const currentOperator = this.bingo.operator[0];
+
+        const indexToRemove = this.cardData.findIndex(
+            (card, index) =>
+                card.number === this.currentCalculation.result &&
+                !this.removedIndexes.has(index) &&
+                !this.usedIndexes.has(index) &&
+                this.currentCalculation.operator.includes(currentOperator)
         );
+
+        if (indexToRemove !== -1) {
+            this.removedIndexes.add(indexToRemove);
+
+            const card = this.cardData[indexToRemove];
+            const cardImage = this.children.getByName(
+                card.key + "_image"
+            ) as Phaser.GameObjects.Image;
+            const cardText = this.children.getByName(
+                card.key + "_text"
+            ) as Phaser.GameObjects.Text;
+
+            if (cardImage) cardImage.destroy();
+            if (cardText) cardText.destroy();
+
+            console.log(
+                `Removed question: ${
+                    this.currentCalculation.valueA
+                } ${this.calculationDrawer.convertOperatorToSymbol(
+                    this.currentCalculation.operator[0]
+                )} ${this.currentCalculation.valueB} = ${
+                    this.currentCalculation.result
+                }`
+            );
+            this.updateCalculation(this.bingo.operator[0]);
+            this.calculationText.setText(
+                this.calculationDrawer.getCalculationText(
+                    this.currentCalculation
+                )
+            );
+        }
+
         this.timerManager.reset();
     }
 
@@ -217,9 +283,7 @@ export default class GameScene extends Phaser.Scene {
             cardImage.setTint(0x00ff00);
             cardImage.disableInteractive();
 
-            if (this.clockManager) {
-                this.clockManager.reset(this.duration);
-            }
+            this.timerManager.reset(this.duration);
             console.log(`Timer reset to: ${this.duration} seconds`);
 
             if (this.checkWin()) {
@@ -235,13 +299,13 @@ export default class GameScene extends Phaser.Scene {
                 );
             }
         } else {
-            // Xử lý trường hợp trả lời sai
-
             const incorrectAnswer = card.number;
             // console.log(`Incorrect Answer: ${incorrectAnswer}`);
             // console.log(`Incorrect card number: ${card.number}`);
-
-            const indexToRemove = CalculationData.findIndex(
+            const filteredData = CalculationData.filter((calc) =>
+                calc.operator.includes(this.bingo.operator[0])
+            );
+            const indexToRemove = filteredData.findIndex(
                 (calc, index) =>
                     calc.result === incorrectAnswer &&
                     !this.removedIndexes.has(index) &&
@@ -261,21 +325,19 @@ export default class GameScene extends Phaser.Scene {
                         CalculationData[indexToRemove].result
                     }`
                 );
-            } else {
-                console.log("No matching question found to remove.");
             }
             // console.log("Các câu hỏi sai:", Array.from(this.removedIndexes));
 
             cardImage.destroy();
             cardText.destroy();
 
-            this.updateCalculation(this.bingo.operator[0]); // Tải câu hỏi mới
+            // this.updateCalculation(this.bingo.operator[0]); // Tải câu hỏi mới
 
-            this.calculationText.setText(
-                this.calculationDrawer.getCalculationText(
-                    this.currentCalculation
-                )
-            );
+            // this.calculationText.setText(
+            //     this.calculationDrawer.getCalculationText(
+            //         this.currentCalculation
+            //     )
+            // );
         }
     }
     updateCalculation(operator: string): void {
@@ -300,25 +362,6 @@ export default class GameScene extends Phaser.Scene {
             console.error("calculationDrawer is not initialized!");
         }
         console.log("Unused Calculations:");
-        unusedCalculations.forEach((calc, index) => {
-            if (
-                calc.operator &&
-                Array.isArray(calc.operator) &&
-                calc.operator.length > 0
-            ) {
-                console.log(
-                    `Question ${index + 1}: ${
-                        calc.valueA
-                    } ${this.calculationDrawer.convertOperatorToSymbol(
-                        calc.operator[0]
-                    )} ${calc.valueB} = ?`
-                );
-            } else {
-                console.error(
-                    `Invalid or missing operator for Question ${index + 1}`
-                );
-            }
-        });
         const randomCalculation =
             unusedCalculations[
                 Math.floor(Math.random() * unusedCalculations.length)
@@ -334,10 +377,6 @@ export default class GameScene extends Phaser.Scene {
         const usedIndex = filteredData.indexOf(randomCalculation);
         this.usedIndexes.add(usedIndex);
         // console.log("Added to usedIndexes:", usedIndex);
-
-        if (this.clockManager) {
-            this.clockManager.reset(this.duration);
-        }
     }
     // checkRemainingWinningPaths(): boolean {
     //     const { cols, rows } = this.bingo;

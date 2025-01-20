@@ -1,9 +1,9 @@
 import Phaser from "phaser";
-import { CalculationDTO } from "../dto/CalculationDTO"; // Import DTO nếu cần
+import { CalculationDTO } from "../dto/CalculationDTO";
 
 export default class CalculationDrawer {
     private scene: Phaser.Scene;
-    private calculationText: Phaser.GameObjects.Text | null; // Cho phép nhận null
+    private calculationText: Phaser.GameObjects.Text | null;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -22,11 +22,9 @@ export default class CalculationDrawer {
 
         const calcText = this.getCalculationText(currentCalculation);
 
-        // Kiểm tra xem calculationText đã tồn tại chưa
         if (this.calculationText) {
-            this.calculationText.setText(calcText); // Cập nhật text nếu đã tồn tại
+            this.calculationText.setText(calcText);
         } else {
-            // Nếu chưa tồn tại, tạo mới
             this.calculationText = this.scene.add
                 .text(this.scene.cameras.main.centerX, 150, calcText, {
                     fontSize: "24px",
@@ -37,7 +35,6 @@ export default class CalculationDrawer {
                 .setOrigin(0.5, 0.5);
         }
 
-        // Tạo hình nền của câu hỏi
         this.scene.add
             .image(this.scene.cameras.main.centerX, 150, "CalculationCard")
             .setFrame(0)

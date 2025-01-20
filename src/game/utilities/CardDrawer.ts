@@ -1,10 +1,9 @@
-// src/utilities/CardDrawer.ts
 import Phaser from "phaser";
 import { CardDTO } from "../dto/CardDTO";
-import GameScene from "../scenes/GameScene"; // Import GameScene
+import GameScene from "../scenes/GameScene";
 
 export default class CardDrawer {
-    private scene: GameScene; // Đổi kiểu từ Phaser.Scene sang GameScene
+    private scene: GameScene;
     private cardData: CardDTO[];
     private bingo: { cols: number; rows: number };
 
@@ -13,7 +12,7 @@ export default class CardDrawer {
         bingo: { cols: number; rows: number },
         cardData: CardDTO[]
     ) {
-        this.scene = scene; // Khai báo đúng kiểu GameScene
+        this.scene = scene;
         this.bingo = bingo;
         this.cardData = cardData;
     }
@@ -54,7 +53,6 @@ export default class CardDrawer {
                 card["text"] = cardText;
 
                 cardImage.on("pointerdown", () => {
-                    // Gọi phương thức checkCorrect từ GameScene
                     this.scene.checkCorrect(card, cardImage, cardText);
                 });
 
