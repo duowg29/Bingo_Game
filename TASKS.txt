@@ -1,8 +1,8 @@
 Sửa lại toàn bộ logic game
 
+-với các phép toán trừ nhân chia thì không xóa được dữ liệu khi trả lời sai
+
 -Sửa lại các thiết kế ( chọn ảnh cho đẹp)
 -push code maze lên github
 
 -khi hết thời gian thì chưa xóa hiển thị thẻ cho đáp án của câu hỏi hiện tại
--với các phép toán trừ nhân chia thì không xóa được dữ liệu khi trả lời sai
--

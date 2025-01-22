@@ -186,47 +186,13 @@ export default class GameScene extends Phaser.Scene {
         this.cameras.resize(width, height);
     }
     onTimeOut(): void {
-        const currentOperator = this.bingo.operator[0];
+        this.updateCalculation(this.bingo.operator[0]);
 
-        const indexToRemove = this.cardData.findIndex(
-            (card, index) =>
-                card.number === this.currentCalculation.result &&
-                !this.removedIndexes.has(index) &&
-                !this.usedIndexes.has(index) &&
-                this.currentCalculation.operator.includes(currentOperator)
+        this.calculationText.setText(
+            this.calculationDrawer.getCalculationText(this.currentCalculation)
         );
 
-        if (indexToRemove !== -1) {
-            this.removedIndexes.add(indexToRemove);
-
-            const card = this.cardData[indexToRemove];
-            const cardImage = this.children.getByName(
-                card.key + "_image"
-            ) as Phaser.GameObjects.Image;
-            const cardText = this.children.getByName(
-                card.key + "_text"
-            ) as Phaser.GameObjects.Text;
-
-            if (cardImage) cardImage.destroy();
-            if (cardText) cardText.destroy();
-
-            console.log(
-                `Removed question: ${
-                    this.currentCalculation.valueA
-                } ${this.calculationDrawer.convertOperatorToSymbol(
-                    this.currentCalculation.operator[0]
-                )} ${this.currentCalculation.valueB} = ${
-                    this.currentCalculation.result
-                }`
-            );
-            this.updateCalculation(this.bingo.operator[0]);
-            this.calculationText.setText(
-                this.calculationDrawer.getCalculationText(
-                    this.currentCalculation
-                )
-            );
-        }
-
+        // Reset lại bộ đếm thời gian
         this.timerManager.reset();
     }
 
@@ -283,13 +249,27 @@ export default class GameScene extends Phaser.Scene {
             cardImage.setTint(0x00ff00);
             cardImage.disableInteractive();
 
+            // Đánh dấu câu hỏi hiện tại vào usedIndexes
+            const filteredData = CalculationData.filter((calc) =>
+                calc.operator.includes(this.bingo.operator[0])
+            );
+            const currentIndex = filteredData.findIndex(
+                (calc) =>
+                    calc.valueA === this.currentCalculation.valueA &&
+                    calc.valueB === this.currentCalculation.valueB &&
+                    calc.result === this.currentCalculation.result
+            );
+
+            if (currentIndex !== -1) {
+                this.usedIndexes.add(currentIndex);
+                console.log("Added to usedIndexes:", currentIndex);
+            }
+
             this.timerManager.reset(this.duration);
             console.log(`Timer reset to: ${this.duration} seconds`);
 
             if (this.checkWin()) {
                 this.scene.start("EndScene");
-                // } else if (!this.checkRemainingWinningPaths()) {
-                //     this.scene.start("LostScene");
             } else {
                 this.updateCalculation(this.bingo.operator[0]);
                 this.calculationText.setText(
@@ -300,8 +280,6 @@ export default class GameScene extends Phaser.Scene {
             }
         } else {
             const incorrectAnswer = card.number;
-            // console.log(`Incorrect Answer: ${incorrectAnswer}`);
-            // console.log(`Incorrect card number: ${card.number}`);
             const filteredData = CalculationData.filter((calc) =>
                 calc.operator.includes(this.bingo.operator[0])
             );
@@ -311,8 +289,6 @@ export default class GameScene extends Phaser.Scene {
                     !this.removedIndexes.has(index) &&
                     !this.usedIndexes.has(index)
             );
-
-            // console.log("Index to remove:", indexToRemove);
 
             if (indexToRemove !== -1) {
                 this.removedIndexes.add(indexToRemove);
@@ -326,20 +302,12 @@ export default class GameScene extends Phaser.Scene {
                     }`
                 );
             }
-            // console.log("Các câu hỏi sai:", Array.from(this.removedIndexes));
 
             cardImage.destroy();
             cardText.destroy();
-
-            // this.updateCalculation(this.bingo.operator[0]); // Tải câu hỏi mới
-
-            // this.calculationText.setText(
-            //     this.calculationDrawer.getCalculationText(
-            //         this.currentCalculation
-            //     )
-            // );
         }
     }
+
     updateCalculation(operator: string): void {
         console.log(`Operator: ${operator}`);
 
@@ -374,8 +342,8 @@ export default class GameScene extends Phaser.Scene {
             [operator]
         );
 
-        const usedIndex = filteredData.indexOf(randomCalculation);
-        this.usedIndexes.add(usedIndex);
+        // const usedIndex = filteredData.indexOf(randomCalculation);
+        // this.usedIndexes.add(usedIndex);
         // console.log("Added to usedIndexes:", usedIndex);
     }
     // checkRemainingWinningPaths(): boolean {
