@@ -271,7 +271,7 @@ export default class GameScene extends Phaser.Scene {
             if (this.checkWin()) {
                 this.scene.start("EndScene");
             } else if (!this.checkRemainingWinningPaths()) {
-                this.scene.start("EndScene"); // Không còn khả năng chiến thắng, dừng game
+                this.scene.start("EndScene");
             } else {
                 this.updateCalculation(this.bingo.operator[0]);
                 this.calculationText.setText(
@@ -309,6 +309,47 @@ export default class GameScene extends Phaser.Scene {
             cardText.destroy();
         }
     }
+    checkRemainingWinningPaths(): boolean {
+        const { cols, rows } = this.bingo;
+
+        // Kiểm tra các hàng
+        for (let row = 0; row < rows; row++) {
+            let markedCount = 0;
+            for (let col = 0; col < cols; col++) {
+                const cardKey = `card${row * cols + col + 1}`;
+                const card = CardData.find((card) => card.key === cardKey);
+
+                if (card) {
+                    markedCount++;
+                }
+
+                if (markedCount === 5) {
+                    console.log(`Hàng ${row + 1} vẫn còn đủ 5 ô.`);
+                    return true;
+                }
+            }
+        }
+
+        // Kiểm tra các cột
+        for (let col = 0; col < cols; col++) {
+            let markedCount = 0;
+            for (let row = 0; row < rows; row++) {
+                const cardKey = `card${row * cols + col + 1}`;
+                const card = CardData.find((card) => card.key === cardKey);
+
+                if (card) {
+                    markedCount++;
+                }
+
+                if (markedCount === 5) {
+                    console.log(`Cột ${col + 1} vẫn còn đủ 5 ô.`);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     updateCalculation(operator: string): void {
         console.log(`Operator: ${operator}`);
@@ -344,46 +385,6 @@ export default class GameScene extends Phaser.Scene {
             [operator]
         );
     }
-    checkRemainingWinningPaths(): boolean {
-        const { cols, rows } = this.bingo;
-
-        for (let row = 0; row < rows; row++) {
-            let cellCount = 0;
-            for (let col = 0; col < cols; col++) {
-                const index = row * cols + col;
-                if (this.cardData[index]) {
-                    cellCount++;
-                    if (cellCount === 5) {
-                        console.log(`Hàng ${row + 1} vẫn còn đủ 5 ô.`);
-                        return true;
-                    }
-                } else {
-                    cellCount = 0;
-                }
-            }
-        }
-
-        // Kiểm tra tất cả các cột
-        for (let col = 0; col < cols; col) {
-            let cellCount = 0;
-            for (let row = 0; row < rows; row++) {
-                const index = row * cols + col;
-                if (this.cardData[index]) {
-                    cellCount++;
-                    if (cellCount === 5) {
-                        console.log(`Cột ${col + 1} vẫn còn đủ 5 ô.`);
-                        return true;
-                    }
-                } else {
-                    cellCount = 0;
-                }
-            }
-        }
-
-        console.log("Không còn hàng hoặc cột nào có đủ 5 ô.");
-        return false;
-    }
-
     update(): void {
         const remainingTime = Math.max(0, this.timerManager.getRemainingTime());
 
