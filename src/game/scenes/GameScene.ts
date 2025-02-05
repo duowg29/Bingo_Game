@@ -270,6 +270,8 @@ export default class GameScene extends Phaser.Scene {
 
             if (this.checkWin()) {
                 this.scene.start("EndScene");
+            } else if (!this.checkRemainingWinningPaths()) {
+                this.scene.start("EndScene"); // Không còn khả năng chiến thắng, dừng game
             } else {
                 this.updateCalculation(this.bingo.operator[0]);
                 this.calculationText.setText(
@@ -341,50 +343,46 @@ export default class GameScene extends Phaser.Scene {
             randomCalculation.result,
             [operator]
         );
-
-        // const usedIndex = filteredData.indexOf(randomCalculation);
-        // this.usedIndexes.add(usedIndex);
-        // console.log("Added to usedIndexes:", usedIndex);
     }
-    // checkRemainingWinningPaths(): boolean {
-    //     const { cols, rows } = this.bingo;
+    checkRemainingWinningPaths(): boolean {
+        const { cols, rows } = this.bingo;
 
-    //     for (let row = 0; row < rows; row++) {
-    //         let cellCount = 0;
-    //         for (let col = 0; col < cols; col++) {
-    //             const index = row * cols + col;
-    //             if (this.cardData[index]) {
-    //                 cellCount++;
-    //                 if (cellCount === 5) {
-    //                     console.log(`Hàng ${row + 1} vẫn còn đủ 5 ô.`);
-    //                     return true;
-    //                 }
-    //             } else {
-    //                 cellCount = 0;
-    //             }
-    //         }
-    //     }
+        for (let row = 0; row < rows; row++) {
+            let cellCount = 0;
+            for (let col = 0; col < cols; col++) {
+                const index = row * cols + col;
+                if (this.cardData[index]) {
+                    cellCount++;
+                    if (cellCount === 5) {
+                        console.log(`Hàng ${row + 1} vẫn còn đủ 5 ô.`);
+                        return true;
+                    }
+                } else {
+                    cellCount = 0;
+                }
+            }
+        }
 
-    //     // Kiểm tra tất cả các cột
-    //     for (let col = 0; col < cols; col) {
-    //         let cellCount = 0;
-    //         for (let row = 0; row < rows; row++) {
-    //             const index = row * cols + col;
-    //             if (this.cardData[index]) {
-    //                 cellCount++;
-    //                 if (cellCount === 5) {
-    //                     console.log(`Cột ${col + 1} vẫn còn đủ 5 ô.`);
-    //                     return true;
-    //                 }
-    //             } else {
-    //                 cellCount = 0;
-    //             }
-    //         }
-    //     }
+        // Kiểm tra tất cả các cột
+        for (let col = 0; col < cols; col) {
+            let cellCount = 0;
+            for (let row = 0; row < rows; row++) {
+                const index = row * cols + col;
+                if (this.cardData[index]) {
+                    cellCount++;
+                    if (cellCount === 5) {
+                        console.log(`Cột ${col + 1} vẫn còn đủ 5 ô.`);
+                        return true;
+                    }
+                } else {
+                    cellCount = 0;
+                }
+            }
+        }
 
-    //     console.log("Không còn hàng hoặc cột nào có đủ 5 ô.");
-    //     return false;
-    // }
+        console.log("Không còn hàng hoặc cột nào có đủ 5 ô.");
+        return false;
+    }
 
     update(): void {
         const remainingTime = Math.max(0, this.timerManager.getRemainingTime());
