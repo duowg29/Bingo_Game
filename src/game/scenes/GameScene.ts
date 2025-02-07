@@ -271,7 +271,7 @@ export default class GameScene extends Phaser.Scene {
             if (this.checkWin()) {
                 this.scene.start("EndScene");
             } else if (!this.checkRemainingWinningPaths()) {
-                this.scene.start("EndScene");
+                this.scene.start("LostScene");
             } else {
                 this.updateCalculation(this.bingo.operator[0]);
                 this.calculationText.setText(
@@ -281,28 +281,35 @@ export default class GameScene extends Phaser.Scene {
                 );
             }
         } else {
+            // const incorrectAnswer = card.number;
+            // const filteredData = CalculationData.filter((calc) =>
+            //     calc.operator.includes(this.bingo.operator[0])
+            // );
+            // const indexToRemove = filteredData.findIndex(
+            //     (calc, index) =>
+            //         calc.result === incorrectAnswer &&
+            //         !this.removedIndexes.has(index) &&
+            //         !this.usedIndexes.has(index)
+            // );
+
+            // if (indexToRemove !== -1) {
+            //     this.removedIndexes.add(indexToRemove);
+            //     console.log(
+            //         `Removed question: ${
+            //             CalculationData[indexToRemove].valueA
+            //         } ${this.calculationDrawer.convertOperatorToSymbol(
+            //             CalculationData[indexToRemove].operator[0]
+            //         )} ${CalculationData[indexToRemove].valueB} = ${
+            //             CalculationData[indexToRemove].result
+            //         }`
+            //     );
+            // }
             const incorrectAnswer = card.number;
-            const filteredData = CalculationData.filter((calc) =>
-                calc.operator.includes(this.bingo.operator[0])
-            );
-            const indexToRemove = filteredData.findIndex(
-                (calc, index) =>
-                    calc.result === incorrectAnswer &&
-                    !this.removedIndexes.has(index) &&
-                    !this.usedIndexes.has(index)
-            );
+            const indexToRemove = CardData.findIndex((c) => c.key === card.key);
 
             if (indexToRemove !== -1) {
-                this.removedIndexes.add(indexToRemove);
-                console.log(
-                    `Removed question: ${
-                        CalculationData[indexToRemove].valueA
-                    } ${this.calculationDrawer.convertOperatorToSymbol(
-                        CalculationData[indexToRemove].operator[0]
-                    )} ${CalculationData[indexToRemove].valueB} = ${
-                        CalculationData[indexToRemove].result
-                    }`
-                );
+                console.log(`Xóa thẻ ${card.key} khỏi dữ liệu`);
+                CardData.splice(indexToRemove, 1); // Xóa khỏi danh sách
             }
 
             cardImage.destroy();
@@ -312,37 +319,37 @@ export default class GameScene extends Phaser.Scene {
     checkRemainingWinningPaths(): boolean {
         const { cols, rows } = this.bingo;
 
-        // Kiểm tra các hàng
+        // Kiểm tra hàng
         for (let row = 0; row < rows; row++) {
             let markedCount = 0;
             for (let col = 0; col < cols; col++) {
                 const cardKey = `card${row * cols + col + 1}`;
-                const card = CardData.find((card) => card.key === cardKey);
+                const card = CardData.find((c) => c.key === cardKey);
 
                 if (card) {
                     markedCount++;
                 }
 
-                if (markedCount === 5) {
-                    console.log(`Hàng ${row + 1} vẫn còn đủ 5 ô.`);
+                if (markedCount >= 5) {
+                    console.log(`Hàng ${row + 1} vẫn còn ít nhất 5 ô hợp lệ.`);
                     return true;
                 }
             }
         }
 
-        // Kiểm tra các cột
+        // Kiểm tra cột
         for (let col = 0; col < cols; col++) {
             let markedCount = 0;
             for (let row = 0; row < rows; row++) {
                 const cardKey = `card${row * cols + col + 1}`;
-                const card = CardData.find((card) => card.key === cardKey);
+                const card = CardData.find((c) => c.key === cardKey);
 
                 if (card) {
                     markedCount++;
                 }
 
-                if (markedCount === 5) {
-                    console.log(`Cột ${col + 1} vẫn còn đủ 5 ô.`);
+                if (markedCount >= 5) {
+                    console.log(`Cột ${col + 1} vẫn còn ít nhất 5 ô hợp lệ.`);
                     return true;
                 }
             }
