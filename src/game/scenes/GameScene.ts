@@ -30,8 +30,8 @@ export default class GameScene extends Phaser.Scene {
     }
 
     init(data: { operator: string; duration: number }): void {
-        console.log("Received operator:", data.operator);
-        console.log("Received duration:", data.duration);
+        // console.log("Received operator:", data.operator);
+        // console.log("Received duration:", data.duration);
         const bingoConfig = BingoData[0];
         this.bingo = new BingoDTO(
             bingoConfig.id,
@@ -262,16 +262,14 @@ export default class GameScene extends Phaser.Scene {
 
             if (currentIndex !== -1) {
                 this.usedIndexes.add(currentIndex);
-                console.log("Added to usedIndexes:", currentIndex);
+                // console.log("Added to usedIndexes:", currentIndex);
             }
 
             this.timerManager.reset(this.duration);
-            console.log(`Timer reset to: ${this.duration} seconds`);
+            // console.log(`Timer reset to: ${this.duration} seconds`);
 
             if (this.checkWin()) {
                 this.scene.start("EndScene");
-            } else if (!this.checkRemainingWinningPaths()) {
-                this.scene.start("LostScene");
             } else {
                 this.updateCalculation(this.bingo.operator[0]);
                 this.calculationText.setText(
@@ -281,77 +279,91 @@ export default class GameScene extends Phaser.Scene {
                 );
             }
         } else {
-            // const incorrectAnswer = card.number;
-            // const filteredData = CalculationData.filter((calc) =>
-            //     calc.operator.includes(this.bingo.operator[0])
-            // );
-            // const indexToRemove = filteredData.findIndex(
-            //     (calc, index) =>
-            //         calc.result === incorrectAnswer &&
-            //         !this.removedIndexes.has(index) &&
-            //         !this.usedIndexes.has(index)
-            // );
-
-            // if (indexToRemove !== -1) {
-            //     this.removedIndexes.add(indexToRemove);
-            //     console.log(
-            //         `Removed question: ${
-            //             CalculationData[indexToRemove].valueA
-            //         } ${this.calculationDrawer.convertOperatorToSymbol(
-            //             CalculationData[indexToRemove].operator[0]
-            //         )} ${CalculationData[indexToRemove].valueB} = ${
-            //             CalculationData[indexToRemove].result
-            //         }`
-            //     );
-            // }
+            if (!this.checkRemainingWinningPaths()) {
+                this.scene.start("LostScene");
+            } else {
+                this.updateCalculation(this.bingo.operator[0]);
+                this.calculationText.setText(
+                    this.calculationDrawer.getCalculationText(
+                        this.currentCalculation
+                    )
+                );
+            }
             const incorrectAnswer = card.number;
-            const indexToRemove = CardData.findIndex((c) => c.key === card.key);
+            const filteredData = CalculationData.filter((calc) =>
+                calc.operator.includes(this.bingo.operator[0])
+            );
+            const indexToRemove = filteredData.findIndex(
+                (calc, index) =>
+                    calc.result === incorrectAnswer &&
+                    !this.removedIndexes.has(index) &&
+                    !this.usedIndexes.has(index)
+            );
 
             if (indexToRemove !== -1) {
-                console.log(`Xóa thẻ ${card.key} khỏi dữ liệu`);
-                CardData.splice(indexToRemove, 1); // Xóa khỏi danh sách
+                this.removedIndexes.add(indexToRemove);
+                const cardIndex = this.cardData.findIndex(
+                    (card) => card?.number === incorrectAnswer
+                );
+
+                if (cardIndex !== -1) {
+                    console.log(
+                        `🔴 Xóa card: ${this.cardData[cardIndex]?.key}`
+                    );
+                    this.cardData[cardIndex] = new CardDTO("", 0, 0, 0, false);
+                }
+                CardData.splice(indexToRemove, 1);
+                console.log(
+                    `Removed question: ${
+                        CalculationData[indexToRemove].valueA
+                    } ${this.calculationDrawer.convertOperatorToSymbol(
+                        CalculationData[indexToRemove].operator[0]
+                    )} ${CalculationData[indexToRemove].valueB} = ${
+                        CalculationData[indexToRemove].result
+                    }`
+                );
             }
 
             cardImage.destroy();
             cardText.destroy();
         }
     }
-    checkRemainingWinningPaths(): boolean {
+    checkRemainingWinningPaths() {
         const { cols, rows } = this.bingo;
 
-        // Kiểm tra hàng
+        // Kiểm tra từng hàng
         for (let row = 0; row < rows; row++) {
-            let markedCount = 0;
-            for (let col = 0; col < cols; col++) {
-                const cardKey = `card${row * cols + col + 1}`;
-                const card = CardData.find((c) => c.key === cardKey);
+            const rowCards = [...Array(cols)].map(
+                (_, col) => this.cardData[row * cols + col]
+            );
 
-                if (card) {
-                    markedCount++;
-                }
+            // In ra danh sách cardKey của từng hàng
+            const rowKeys = rowCards
+                .map((card) => (card ? card.key : "null"))
+                .join(" ");
+            console.log(`Hàng ${row + 1}: ${rowKeys}`);
 
-                if (markedCount >= 5) {
-                    console.log(`Hàng ${row + 1} vẫn còn ít nhất 5 ô hợp lệ.`);
-                    return true;
-                }
+            if (rowCards.every((card) => card !== undefined)) {
+                console.log(`✅ Hàng ${row + 1} vẫn còn đầy đủ các ô hợp lệ.`);
+                return true;
             }
         }
 
-        // Kiểm tra cột
+        // Kiểm tra từng cột
         for (let col = 0; col < cols; col++) {
-            let markedCount = 0;
-            for (let row = 0; row < rows; row++) {
-                const cardKey = `card${row * cols + col + 1}`;
-                const card = CardData.find((c) => c.key === cardKey);
+            const colCards = [...Array(rows)].map(
+                (_, row) => this.cardData[row * cols + col]
+            );
 
-                if (card) {
-                    markedCount++;
-                }
+            // In ra danh sách cardKey của từng cột
+            const colKeys = colCards
+                .map((card) => (card ? card.key : "null"))
+                .join(" ");
+            console.log(`Cột ${col + 1}: ${colKeys}`);
 
-                if (markedCount >= 5) {
-                    console.log(`Cột ${col + 1} vẫn còn ít nhất 5 ô hợp lệ.`);
-                    return true;
-                }
+            if (colCards.every((card) => card !== undefined)) {
+                console.log(`✅ Cột ${col + 1} vẫn còn đầy đủ các ô hợp lệ.`);
+                return true;
             }
         }
 
@@ -359,7 +371,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     updateCalculation(operator: string): void {
-        console.log(`Operator: ${operator}`);
+        // console.log(`Operator: ${operator}`);
 
         const filteredData = CalculationData.filter((calc) =>
             calc.operator.includes(operator)
@@ -379,7 +391,6 @@ export default class GameScene extends Phaser.Scene {
         if (!this.calculationDrawer) {
             console.error("calculationDrawer is not initialized!");
         }
-        console.log("Unused Calculations:");
         const randomCalculation =
             unusedCalculations[
                 Math.floor(Math.random() * unusedCalculations.length)
