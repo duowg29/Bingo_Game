@@ -19,9 +19,22 @@ export default class CardDrawer {
 
     drawCards(): void {
         const { cols, rows } = this.bingo;
+
+        this.cardData.sort((a, b) => {
+            const numA = parseInt(a.key.replace("card", ""));
+            const numB = parseInt(b.key.replace("card", ""));
+            return numA - numB;
+        });
+
+        console.log(
+            "CardData sau khi sắp xếp:",
+            this.cardData.map((card) => card.key).join(" ")
+        );
+
         let cardIndex = 0;
 
         for (let row = 0; row < rows; row++) {
+            let rowCards: string[] = [];
             for (let col = 0; col < cols; col++) {
                 const card = this.cardData[cardIndex];
                 const x =
@@ -56,8 +69,10 @@ export default class CardDrawer {
                     this.scene.checkCorrect(card, cardImage, cardText);
                 });
 
+                rowCards.push(card.key);
                 cardIndex++;
             }
+            console.log(`Dòng ${row + 1}:`, rowCards.join(" "));
         }
     }
 }

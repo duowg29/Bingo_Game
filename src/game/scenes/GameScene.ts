@@ -106,6 +106,7 @@ export default class GameScene extends Phaser.Scene {
                 false
             );
         });
+
         if (!this.calculationDrawer) {
             // console.error("calculationDrawer is not initialized!");
         } else {
@@ -279,16 +280,12 @@ export default class GameScene extends Phaser.Scene {
                 );
             }
         } else {
-            if (!this.checkRemainingWinningPaths()) {
-                this.scene.start("LostScene");
-            } else {
-                this.updateCalculation(this.bingo.operator[0]);
-                this.calculationText.setText(
-                    this.calculationDrawer.getCalculationText(
-                        this.currentCalculation
-                    )
-                );
-            }
+            console.log(
+                `Clicked card: ${card.key}, Index: ${this.cardData.findIndex(
+                    (c) => c.key === card.key
+                )}`
+            );
+
             const incorrectAnswer = card.number;
             const filteredData = CalculationData.filter((calc) =>
                 calc.operator.includes(this.bingo.operator[0])
@@ -304,6 +301,11 @@ export default class GameScene extends Phaser.Scene {
                 this.removedIndexes.add(indexToRemove);
                 const cardIndex = this.cardData.findIndex(
                     (card) => card?.number === incorrectAnswer
+                );
+                console.log(
+                    `Clicked card: ${card.key} (Expected Index: ${
+                        cardIndex + 1
+                    })`
                 );
 
                 if (cardIndex !== -1) {
@@ -326,6 +328,17 @@ export default class GameScene extends Phaser.Scene {
 
             cardImage.destroy();
             cardText.destroy();
+
+            if (!this.checkRemainingWinningPaths()) {
+                this.scene.start("LostScene");
+            } else {
+                this.updateCalculation(this.bingo.operator[0]);
+                this.calculationText.setText(
+                    this.calculationDrawer.getCalculationText(
+                        this.currentCalculation
+                    )
+                );
+            }
         }
     }
     checkRemainingWinningPaths() {
@@ -337,31 +350,28 @@ export default class GameScene extends Phaser.Scene {
                 (_, col) => this.cardData[row * cols + col]
             );
 
-            // In ra danh sách cardKey của từng hàng
             const rowKeys = rowCards
                 .map((card) => (card ? card.key : "null"))
                 .join(" ");
             console.log(`Hàng ${row + 1}: ${rowKeys}`);
 
-            if (rowCards.every((card) => card !== undefined)) {
+            if (rowCards.every((card) => card !== null)) {
                 console.log(`✅ Hàng ${row + 1} vẫn còn đầy đủ các ô hợp lệ.`);
                 return true;
             }
         }
 
-        // Kiểm tra từng cột
         for (let col = 0; col < cols; col++) {
             const colCards = [...Array(rows)].map(
                 (_, row) => this.cardData[row * cols + col]
             );
 
-            // In ra danh sách cardKey của từng cột
             const colKeys = colCards
                 .map((card) => (card ? card.key : "null"))
                 .join(" ");
             console.log(`Cột ${col + 1}: ${colKeys}`);
 
-            if (colCards.every((card) => card !== undefined)) {
+            if (colCards.every((card) => card !== null)) {
                 console.log(`✅ Cột ${col + 1} vẫn còn đầy đủ các ô hợp lệ.`);
                 return true;
             }
