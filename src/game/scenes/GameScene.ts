@@ -312,9 +312,20 @@ export default class GameScene extends Phaser.Scene {
                     console.log(
                         `🔴 Xóa card: ${this.cardData[cardIndex]?.key}`
                     );
+                    // console.log(
+                    //     "Before:",
+                    //     this.cardData.map((c) => c.key)
+                    // );
                     this.cardData[cardIndex] = new CardDTO("", 0, 0, 0, false);
+                    // console.log(
+                    //     "After:",
+                    //     this.cardData.map((c) => c.key)
+                    // );
                 }
-                CardData.splice(indexToRemove, 1);
+                // console.log("Filtered Data:", filteredData);
+                // console.log("Incorrect Answer:", incorrectAnswer);
+                // console.log("Index to Remove:", indexToRemove);
+                // CardData.splice(indexToRemove, 1);
                 console.log(
                     `Removed question: ${
                         CalculationData[indexToRemove].valueA
@@ -342,6 +353,8 @@ export default class GameScene extends Phaser.Scene {
         }
     }
     checkRemainingWinningPaths() {
+        // console.log("Card Data:", this.cardData);
+
         const { cols, rows } = this.bingo;
 
         // Kiểm tra từng hàng
@@ -355,7 +368,11 @@ export default class GameScene extends Phaser.Scene {
                 .join(" ");
             console.log(`Hàng ${row + 1}: ${rowKeys}`);
 
-            if (rowCards.every((card) => card !== null)) {
+            const validRowCards = rowCards.filter(
+                (card) => card && card.key !== ""
+            ).length;
+
+            if (validRowCards === cols) {
                 console.log(`✅ Hàng ${row + 1} vẫn còn đầy đủ các ô hợp lệ.`);
                 return true;
             }
@@ -371,7 +388,11 @@ export default class GameScene extends Phaser.Scene {
                 .join(" ");
             console.log(`Cột ${col + 1}: ${colKeys}`);
 
-            if (colCards.every((card) => card !== null)) {
+            const validColCards = colCards.filter(
+                (card) => card && card.key !== ""
+            ).length;
+
+            if (validColCards === rows) {
                 console.log(`✅ Cột ${col + 1} vẫn còn đầy đủ các ô hợp lệ.`);
                 return true;
             }
@@ -386,13 +407,13 @@ export default class GameScene extends Phaser.Scene {
         const filteredData = CalculationData.filter((calc) =>
             calc.operator.includes(operator)
         );
-        console.log("Filtered Calculations:", filteredData);
+        // console.log("Filtered Calculations:", filteredData);
 
         const unusedCalculations = filteredData.filter(
             (_, index) =>
                 !this.usedIndexes.has(index) && !this.removedIndexes.has(index)
         );
-        console.log("Unused Calculations:", unusedCalculations);
+        // console.log("Unused Calculations:", unusedCalculations);
 
         if (unusedCalculations.length === 0) {
             this.scene.start("LostScene");
