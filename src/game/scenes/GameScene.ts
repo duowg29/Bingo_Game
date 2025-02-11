@@ -145,7 +145,7 @@ export default class GameScene extends Phaser.Scene {
         let remainingTime = this.duration;
         const initialAngle = Phaser.Math.DegToRad(270);
 
-        // Hàm cập nhật đồng hồ
+        // cập nhật đồng hồ
         const updateClock = () => {
             timerArc.clear();
 
@@ -187,6 +187,42 @@ export default class GameScene extends Phaser.Scene {
         this.cameras.resize(width, height);
     }
     onTimeOut(): void {
+        // const answerToRemove = this.currentCalculation.result;
+
+        // // Tìm thẻ đầu tiên có số trùng với đáp án
+        // const cardIndex = this.cardData.findIndex(
+        //     (card) => card.number === answerToRemove
+        // );
+
+        // if (cardIndex !== -1) {
+        //     const card = this.cardData[cardIndex];
+        //     const cardKey = card.key;
+
+        //     console.log(`⏳ Hết thời gian! Xóa thẻ: ${cardKey}`);
+
+        //     // Tìm ảnh và text của thẻ
+        //     const cardImage = this.children.getByName(
+        //         `cardImage_${cardKey}`
+        //     ) as Phaser.GameObjects.Image;
+        //     const cardText = this.children.getByName(
+        //         `cardText_${cardKey}`
+        //     ) as Phaser.GameObjects.Text;
+
+        //     // Đặt số trên thẻ thành 0
+        //     card.number = 0;
+
+        //     // Kiểm tra và xóa bằng checkCorrect
+        //     if (cardImage && cardText) {
+        //         this.checkCorrect(card, cardImage, cardText);
+        //     }
+
+        //     // Cập nhật danh sách các thẻ đã bị xóa
+        //     this.removedIndexes.add(cardIndex);
+        //     this.cardData[cardIndex] = new CardDTO("", 0, 0, 0, false);
+
+        //     console.log(`🔴 Đã xóa card ${cardKey}`);
+        // }
+
         this.updateCalculation(this.bingo.operator[0]);
 
         this.calculationText.setText(
