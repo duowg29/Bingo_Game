@@ -300,7 +300,7 @@ export default class GameScene extends Phaser.Scene {
             if (indexToRemove !== -1) {
                 this.removedIndexes.add(indexToRemove);
                 const cardIndex = this.cardData.findIndex(
-                    (card) => card?.number === incorrectAnswer
+                    (c) => c.key === card.key
                 );
                 console.log(
                     `Clicked card: ${card.key} (Expected Index: ${

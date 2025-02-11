@@ -26,10 +26,10 @@ export default class CardDrawer {
             return numA - numB;
         });
 
-        console.log(
-            "CardData sau khi sắp xếp:",
-            this.cardData.map((card) => card.key).join(" ")
-        );
+        // console.log(
+        //     "CardData sau khi sắp xếp:",
+        //     this.cardData.map((card) => card.key).join(" ")
+        // );
 
         let cardIndex = 0;
 
