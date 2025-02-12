@@ -14,7 +14,7 @@ const config: Phaser.Types.Core.GameConfig = {
     width: 800,
     height: 900,
     parent: "game-container",
-    backgroundColor: "#028af8",
+    backgroundColor: "#ffffff",
     scene: [Boot, MenuScene, SelectDifficulty, GameScene, EndScene, LostScene],
     scale: {
         mode: Phaser.Scale.FIT,
