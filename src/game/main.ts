@@ -16,6 +16,10 @@ const config: Phaser.Types.Core.GameConfig = {
     parent: "game-container",
     backgroundColor: "#028af8",
     scene: [Boot, MenuScene, SelectDifficulty, GameScene, EndScene, LostScene],
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
 };
 
 const StartGame = (parent: string) => {
