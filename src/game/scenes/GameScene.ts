@@ -107,11 +107,6 @@ export default class GameScene extends Phaser.Scene {
             );
         });
 
-        if (!this.calculationDrawer) {
-            // console.error("calculationDrawer is not initialized!");
-        } else {
-            this.calculationDrawer.drawCalculation(this.currentCalculation);
-        }
         this.calculationDrawer.drawCalculation(this.currentCalculation);
 
         if (!this.calculationText) {
@@ -187,49 +182,56 @@ export default class GameScene extends Phaser.Scene {
         this.cameras.resize(width, height);
     }
     onTimeOut(): void {
-        // const answerToRemove = this.currentCalculation.result;
+        const answerToRemove = this.currentCalculation.result;
 
-        // // Tìm thẻ đầu tiên có số trùng với đáp án
-        // const cardIndex = this.cardData.findIndex(
-        //     (card) => card.number === answerToRemove
-        // );
+        const cardIndex = this.cardData.findIndex(
+            (card) => card.number === answerToRemove
+        );
 
-        // if (cardIndex !== -1) {
-        //     const card = this.cardData[cardIndex];
-        //     const cardKey = card.key;
+        if (cardIndex !== -1) {
+            const card = this.cardData[cardIndex];
+            const cardKey = card.key;
 
-        //     console.log(`⏳ Hết thời gian! Xóa thẻ: ${cardKey}`);
+            console.log(`⏳ Hết thời gian! Xóa thẻ: ${cardKey}`);
 
-        //     // Tìm ảnh và text của thẻ
-        //     const cardImage = this.children.getByName(
-        //         `cardImage_${cardKey}`
-        //     ) as Phaser.GameObjects.Image;
-        //     const cardText = this.children.getByName(
-        //         `cardText_${cardKey}`
-        //     ) as Phaser.GameObjects.Text;
+            const cardImage = this.children
+                .getChildren()
+                .find(
+                    (child) =>
+                        child instanceof Phaser.GameObjects.Image &&
+                        child.name === `cardImage_${cardKey}`
+                ) as Phaser.GameObjects.Image;
 
-        //     // Đặt số trên thẻ thành 0
-        //     card.number = 0;
+            const cardText = this.children
+                .getChildren()
+                .find(
+                    (child) =>
+                        child instanceof Phaser.GameObjects.Text &&
+                        child.name === `cardText_${cardKey}`
+                ) as Phaser.GameObjects.Text;
 
-        //     // Kiểm tra và xóa bằng checkCorrect
-        //     if (cardImage && cardText) {
-        //         this.checkCorrect(card, cardImage, cardText);
-        //     }
+            if (cardImage && cardText) {
+                // console.log(`🔴 Đã tìm thấy UI của ${cardKey}, tiến hành xóa`);
+                cardImage.destroy();
+                cardText.destroy();
+            } else {
+                console.warn(
+                    `⚠ Không tìm thấy UI của ${cardKey}, thử giả lập click`
+                );
+                this.checkCorrect(card, cardImage, cardText);
+            }
 
-        //     // Cập nhật danh sách các thẻ đã bị xóa
-        //     this.removedIndexes.add(cardIndex);
-        //     this.cardData[cardIndex] = new CardDTO("", 0, 0, 0, false);
+            this.removedIndexes.add(cardIndex);
+            this.cardData[cardIndex] = new CardDTO("", 0, 0, 0, false);
 
-        //     console.log(`🔴 Đã xóa card ${cardKey}`);
-        // }
+            console.log(`🔴 Đã xóa card ${cardKey} trên logic và UI`);
+        }
 
         this.updateCalculation(this.bingo.operator[0]);
-
         this.calculationText.setText(
             this.calculationDrawer.getCalculationText(this.currentCalculation)
         );
 
-        // Reset lại bộ đếm thời gian
         this.timerManager.reset();
     }
 
@@ -375,6 +377,8 @@ export default class GameScene extends Phaser.Scene {
 
             cardImage.destroy();
             cardText.destroy();
+
+            this.timerManager.reset(this.duration);
 
             if (!this.checkRemainingWinningPaths()) {
                 this.scene.start("LostScene");

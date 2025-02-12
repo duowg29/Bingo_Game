@@ -53,7 +53,8 @@ export default class CardDrawer {
                     .setFrame(0)
                     .setDisplaySize(card.width, card.height)
                     .setOrigin(0.5, 0.5)
-                    .setInteractive();
+                    .setInteractive()
+                    .setName(`cardImage_${card.key}`);
 
                 const cardText = this.scene.add
                     .text(x, y, `${card.number}`, {
@@ -61,7 +62,8 @@ export default class CardDrawer {
                         color: "#000",
                         fontStyle: "bold",
                     })
-                    .setOrigin(0.5, 0.5);
+                    .setOrigin(0.5, 0.5)
+                    .setName(`cardText_${card.key}`);
 
                 card["text"] = cardText;
 
