@@ -2,4 +2,5 @@
 -Sửa lại các thiết kế ( chọn ảnh cho đẹp)
 -push code maze lên github
 
--khi hết thời gian thì chưa xóa hiển thị thẻ cho đáp án của câu hỏi hiện tại
+-Trong đó có 1 vấn đề performance đáng quan ngại, đó là lúc load game mới hoặc lúc end game bị lag một lúc.
+-Và 1 cái nữa nên làm đó là bắt sự kiện resize của windows để responsive lại game
