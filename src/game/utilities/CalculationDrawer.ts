@@ -11,15 +11,6 @@ export default class CalculationDrawer {
     }
 
     drawCalculation(currentCalculation: CalculationDTO): void {
-        if (
-            !currentCalculation ||
-            !currentCalculation.operator ||
-            currentCalculation.operator.length === 0
-        ) {
-            console.error("Invalid or missing operator in currentCalculation.");
-            return;
-        }
-
         const calcText = this.getCalculationText(currentCalculation);
 
         if (this.calculationText) {

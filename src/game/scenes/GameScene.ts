@@ -21,7 +21,6 @@ export default class GameScene extends Phaser.Scene {
     private usedIndexes: Set<number> = new Set();
     private duration: number;
     private timerManager: TimerManager;
-    private timerText: Phaser.GameObjects.Text;
     private removedIndexes: Set<number> = new Set();
     private calculationDrawer: CalculationDrawer;
 
@@ -30,8 +29,6 @@ export default class GameScene extends Phaser.Scene {
     }
 
     init(data: { operator: string; duration: number }): void {
-        // console.log("Received operator:", data.operator);
-        // console.log("Received duration:", data.duration);
         const bingoConfig = BingoData[0];
         this.bingo = new BingoDTO(
             bingoConfig.id,
@@ -140,7 +137,6 @@ export default class GameScene extends Phaser.Scene {
         let remainingTime = this.duration;
         const initialAngle = Phaser.Math.DegToRad(270);
 
-        // cập nhật đồng hồ
         const updateClock = () => {
             timerArc.clear();
 
@@ -211,13 +207,9 @@ export default class GameScene extends Phaser.Scene {
                 ) as Phaser.GameObjects.Text;
 
             if (cardImage && cardText) {
-                // console.log(`🔴 Đã tìm thấy UI của ${cardKey}, tiến hành xóa`);
                 cardImage.destroy();
                 cardText.destroy();
             } else {
-                console.warn(
-                    `⚠ Không tìm thấy UI của ${cardKey}, thử giả lập click`
-                );
                 this.checkCorrect(card, cardImage, cardText);
             }
 
@@ -288,7 +280,6 @@ export default class GameScene extends Phaser.Scene {
             cardImage.setTint(0x00ff00);
             cardImage.disableInteractive();
 
-            // Đánh dấu câu hỏi hiện tại vào usedIndexes
             const filteredData = CalculationData.filter((calc) =>
                 calc.operator.includes(this.bingo.operator[0])
             );
@@ -301,11 +292,9 @@ export default class GameScene extends Phaser.Scene {
 
             if (currentIndex !== -1) {
                 this.usedIndexes.add(currentIndex);
-                // console.log("Added to usedIndexes:", currentIndex);
             }
 
             this.timerManager.reset(this.duration);
-            // console.log(`Timer reset to: ${this.duration} seconds`);
 
             if (this.checkWin()) {
                 this.scene.start("EndScene");
@@ -350,20 +339,8 @@ export default class GameScene extends Phaser.Scene {
                     console.log(
                         `🔴 Xóa card: ${this.cardData[cardIndex]?.key}`
                     );
-                    // console.log(
-                    //     "Before:",
-                    //     this.cardData.map((c) => c.key)
-                    // );
                     this.cardData[cardIndex] = new CardDTO("", 0, 0, 0, false);
-                    // console.log(
-                    //     "After:",
-                    //     this.cardData.map((c) => c.key)
-                    // );
                 }
-                // console.log("Filtered Data:", filteredData);
-                // console.log("Incorrect Answer:", incorrectAnswer);
-                // console.log("Index to Remove:", indexToRemove);
-                // CardData.splice(indexToRemove, 1);
                 console.log(
                     `Removed question: ${
                         CalculationData[indexToRemove].valueA
@@ -393,11 +370,7 @@ export default class GameScene extends Phaser.Scene {
         }
     }
     checkRemainingWinningPaths() {
-        // console.log("Card Data:", this.cardData);
-
         const { cols, rows } = this.bingo;
-
-        // Kiểm tra từng hàng
         for (let row = 0; row < rows; row++) {
             const rowCards = [...Array(cols)].map(
                 (_, col) => this.cardData[row * cols + col]
@@ -442,18 +415,14 @@ export default class GameScene extends Phaser.Scene {
     }
 
     updateCalculation(operator: string): void {
-        // console.log(`Operator: ${operator}`);
-
         const filteredData = CalculationData.filter((calc) =>
             calc.operator.includes(operator)
         );
-        // console.log("Filtered Calculations:", filteredData);
 
         const unusedCalculations = filteredData.filter(
             (_, index) =>
                 !this.usedIndexes.has(index) && !this.removedIndexes.has(index)
         );
-        // console.log("Unused Calculations:", unusedCalculations);
 
         if (unusedCalculations.length === 0) {
             this.scene.start("LostScene");

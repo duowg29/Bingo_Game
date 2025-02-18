@@ -139,22 +139,6 @@ export default class SelectDifficulty extends Phaser.Scene {
         );
 
         new Button(this, startButtonDTO);
-
-        this.scale.on("resize", this.resize, this);
-    }
-
-    resize(gameSize: Phaser.Structs.Size): void {
-        const width = gameSize.width;
-        const height = gameSize.height;
-
-        this.cameras.resize(width, height);
-
-        this.children.list.forEach((child) => {
-            if (child instanceof Phaser.GameObjects.Text) {
-            } else if (child instanceof Phaser.GameObjects.Image) {
-            } else if (child instanceof Phaser.GameObjects.Rectangle) {
-            }
-        });
     }
 
     private createCheckBox(
